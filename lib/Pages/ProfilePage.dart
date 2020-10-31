@@ -1,14 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:stroinav_app/services/authentication.dart';
 
 class PageFour extends StatefulWidget {
-  PageFour({Key key}) : super(key: key);
+  PageFour({Key key, this.auth, this.userId, this.onSignedOut})
+      : super(key: key);
+
+  final BaseAuth auth;
+  final VoidCallback onSignedOut;
+  final String userId;
 
   @override
-  PageFourState createState() => PageFourState();
+  _PageFourState createState() => _PageFourState(
+        userId: userId,
+        auth: auth,
+        onSignedOut: onSignedOut,
+      );
 }
 
-class PageFourState extends State<PageFour> {
+class _PageFourState extends State<PageFour> {
+  _PageFourState({this.auth, this.userId, this.onSignedOut});
+
+  final BaseAuth auth;
+  final VoidCallback onSignedOut;
+  final String userId;
+
   double shw;
   @override
   Widget build(BuildContext context) {

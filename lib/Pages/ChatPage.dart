@@ -1,13 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:stroinav_app/services/authentication.dart';
 
 class PageOne extends StatefulWidget {
-  PageOne({Key key}) : super(key: key);
+  PageOne({Key key, this.auth, this.userId, this.onSignedOut})
+      : super(key: key);
+
+  final BaseAuth auth;
+  final VoidCallback onSignedOut;
+  final String userId;
 
   @override
-  PageOneState createState() => PageOneState();
+  _PageOneState createState() => _PageOneState(
+        userId: userId,
+        auth: auth,
+        onSignedOut: onSignedOut,
+      );
 }
 
-class PageOneState extends State<PageOne> {
+class _PageOneState extends State<PageOne> {
+  _PageOneState({this.auth, this.userId, this.onSignedOut});
+
+  final BaseAuth auth;
+  final VoidCallback onSignedOut;
+  final String userId;
+
   double shw;
   @override
   Widget build(BuildContext context) {
@@ -150,25 +166,23 @@ class PageOneState extends State<PageOne> {
                                 Row(
                                     mainAxisSize: MainAxisSize.max,
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text('Виктор:',
                                           style: TextStyle(
                                             color: Colors.blue,
                                             fontSize: shw / 18,
                                           )),
-
-                                Text(
-                                  'Завтра заканчиваем...',
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: shw / 20,
-                                  ),
-                                ),
-        ])]
-                              ),
-
+                                      Text(
+                                        'Завтра заканчиваем...',
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: shw / 20,
+                                        ),
+                                      ),
+                                    ])
+                              ]),
                         ]),
                   ])),
             ],
