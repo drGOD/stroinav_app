@@ -169,7 +169,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
     if (_isLoading) {
       return Center(
           child: CircularProgressIndicator(
-        valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFFB92139)),
+        valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF255781)),
       ));
     }
     return Container(
@@ -226,7 +226,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
         _errorMessage,
         style: TextStyle(
             fontSize: 13.0,
-            color: Color(0xFFB92139),
+            color: Color(0xFF255781),
             height: 1.0,
             fontWeight: FontWeight.w300),
       );
@@ -343,8 +343,8 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                 elevation: 5.0,
                 shape: new RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(30.0)),
-                color: Color(0xFFB92139),
-                disabledColor: Color(0xFF820014),
+                color: Color(0xFF255781),
+                disabledColor: Color(0xFF255781),
                 child: _loginMode == FormMode.EMPTY
                     ? new Text('Войти в личный кабинет',
                         style:

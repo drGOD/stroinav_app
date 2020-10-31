@@ -47,7 +47,7 @@ class _TemproryPageState extends State<TemproryPage> {
   final Key keyThree = PageStorageKey('pageThree');
   final Key keyFour = PageStorageKey('pageFour');
   final Key keyFive = PageStorageKey('pageFive');
-  int currentTab = 0;
+  int currentTab = 2;
 
   PageOne one;
   PageTwo two;
@@ -82,7 +82,7 @@ class _TemproryPageState extends State<TemproryPage> {
       auth: auth,
       onSignedOut: onSignedOut,*/
         );
-    pages = [one, three, two, four];
+    pages = [one, two, three, four];
 
     currentPage = three;
 
@@ -109,24 +109,26 @@ class _TemproryPageState extends State<TemproryPage> {
         },
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.access_time),
-            title: Text('Расписание'),
+            icon: Icon(Icons.chat),
+            title: Text('Чат'),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.format_list_bulleted),
-            title: Text("Зачетка"),
+            icon: Icon(Icons.location_on),
+            title: Text("Площадка"),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.credit_card),
-            title: Text('sID'),
+            icon: Icon(Icons.timer),
+            title: Text('Учет рабочего времени'),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.business_center),
-            title: Text('Карьера'),
+            icon: Icon(Icons.credit_card_outlined),
+            title: Text('Профиль'),
           ),
         ],
-        type: BottomNavigationBarType.fixed,
-        fixedColor: Color(0xFFB92139),
+        type: BottomNavigationBarType.shifting,
+        unselectedItemColor: Color(0xFF255781),
+        selectedItemColor: Color(0xFB3274ab),
+        //backgroundColor: Color(0xFB474a48),
       ),
     );
   }
