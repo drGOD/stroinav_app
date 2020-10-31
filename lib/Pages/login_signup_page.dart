@@ -221,7 +221,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
   }
 
   Widget _showErrorMessage() {
-    if (/*_errorMessage.length > 0 &&*/ _errorMessage != null) {
+    if (_errorMessage != null) {
       return new Text(
         _errorMessage,
         style: TextStyle(
@@ -337,30 +337,31 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
             ? EdgeInsets.fromLTRB(0.0, 45.0, 0.0, 0.0)
             : EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
         child: SizedBox(
-          width: 350.0,
-          height: 40.0,
-          child: new RaisedButton(
-              elevation: 5.0,
-              shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(30.0)),
-              color: Color(0xFFB92139),
-              disabledColor: Color(0xFF820014),
-              child: _loginMode == FormMode.EMPTY
-                  ? new Text('Войти в личный кабинет',
-                      style: new TextStyle(fontSize: 20.0, color: Colors.white))
-                  : _formMode == FormMode.LOGIN
-                      ? new Text('Войти',
-                          style: new TextStyle(
-                              fontSize: 20.0, color: Colors.white))
-                      : new Text('Создать аккаунт',
-                          style: new TextStyle(
-                              fontSize: 20.0, color: Colors.white)),
-              onPressed: _loginMode == FormMode.EMPTY
-                  ? _changeloginMode
-                  : _formMode == FormMode.LOGIN
-                      ? _validateAndSubmit
-                      : null),
-        ));
+            width: 350.0,
+            height: 40.0,
+            child: new RaisedButton(
+                elevation: 5.0,
+                shape: new RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(30.0)),
+                color: Color(0xFFB92139),
+                disabledColor: Color(0xFF820014),
+                child: _loginMode == FormMode.EMPTY
+                    ? new Text('Войти в личный кабинет',
+                        style:
+                            new TextStyle(fontSize: 20.0, color: Colors.white))
+                    : _formMode == FormMode.LOGIN
+                        ? new Text('Войти',
+                            style: new TextStyle(
+                                fontSize: 20.0, color: Colors.white))
+                        : new Text('Создать аккаунт',
+                            style: new TextStyle(
+                                fontSize: 20.0, color: Colors.white)),
+                onPressed: _loginMode == FormMode.EMPTY
+                    ? _changeloginMode
+                    //: _formMode == FormMode.LOGIN
+                    : _validateAndSubmit
+                // : null),
+                )));
   }
 
   Widget _showRulesButton() {

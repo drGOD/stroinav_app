@@ -37,29 +37,6 @@ class _PageThreeState extends State<PageThree> {
               Padding(
                   padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
                   child: new Column(children: [
-                    Row(
-                        mainAxisSize: MainAxisSize.max,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            mainAxisSize: MainAxisSize.max,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('Иванов Иван',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: shw / 18,
-                                  )),
-                              Text('CO-12-177',
-                                  style: TextStyle(
-                                    color: Colors.black26,
-                                    fontSize: shw / 18,
-                                  )),
-                            ],
-                          ),
-                        ]),
                     Text('Диаграмма',
                         style: TextStyle(
                           color: Colors.black,
