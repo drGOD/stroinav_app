@@ -24,6 +24,7 @@ enum AuthStatus {
 
 class _RootPageState extends State<RootPage> {
   Connectivity connectivity;
+  // ignore: cancel_subscriptions
   StreamSubscription<ConnectivityResult> subscription;
 
   AuthStatus authStatus = AuthStatus.NOT_DETERMINED;

@@ -23,7 +23,7 @@ class TemproryPage extends StatefulWidget {
 }
 
 class _TemproryPageState extends State<TemproryPage> {
-  _TemproryPageState({Key key, this.auth, this.userId, this.onSignedOut});
+  _TemproryPageState({this.auth, this.userId, this.onSignedOut});
 
   final BaseAuth auth;
   final VoidCallback onSignedOut;
