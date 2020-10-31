@@ -59,14 +59,6 @@ class _PageThreeState extends State<PageThree> {
                                   )),
                             ],
                           ),
-                          Container(
-                            constraints: BoxConstraints.expand(
-                              height: 24,
-                              width: 240,
-                            ),
-                            child: Image.asset('image/Logo.png',
-                                fit: BoxFit.contain),
-                          ),
                         ]),
                     Text('Диаграмма',
                         style: TextStyle(

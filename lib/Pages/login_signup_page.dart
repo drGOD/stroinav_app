@@ -1,7 +1,4 @@
 //import 'dart:developer';
-import 'dart:async';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:flutter/material.dart';
@@ -23,7 +20,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
   final _formKey = new GlobalKey<FormState>();
 
   _launchURL() async {
-    var url = 'https://career.ruc.su/';
+    var url = 'https://kaluga.iniciativa.app/docs/tos';
     if (await canLaunch(url)) {
       await launch(url);
     } else {
@@ -33,8 +30,8 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
 
   String _email;
   String _password;
-  String _dogovor;
-  String _dataOfStudent;
+  String _fio;
+  String _dataOfUser;
   String _errorMessage;
 
   FormMode _formMode = FormMode.LOGIN;
@@ -43,59 +40,6 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
   bool _isLoading;
 
   double shw;
-
-  List dataFilials;
-  List dataYears;
-  List dataGroups;
-  List<Filials> _filials;
-  String selectedFilial;
-  List<Years> _years;
-  String selectedYear;
-  List<Groups> _groups;
-  String selectedGroup;
-
-  Future<List<Filials>> getFilials() async {
-    var res = await http.get(Uri.parse("http://api.fucku.tech/getFilials"),
-        headers: {"Accept": "application/json"});
-
-    setState(() {
-      var resBody = json.decode(utf8.decode(res.bodyBytes));
-      dataFilials = resBody['result']['return']['Filial'];
-      _filials = [];
-      _filials =
-          (dataFilials).map<Filials>((item) => Filials.fromJson(item)).toList();
-    });
-    return _filials;
-  }
-
-  Future<List<Years>> getYears() async {
-    var res = await http.get(Uri.parse("http://api.fucku.tech/getEduYears"),
-        headers: {"Accept": "application/json"});
-
-    setState(() {
-      var resBody = json.decode(utf8.decode(res.bodyBytes));
-      dataYears = resBody['result']['return']['EduYear'];
-      _years = [];
-      _years = (dataYears).map<Years>((item) => Years.fromJson(item)).toList();
-    });
-    return _years;
-  }
-
-  Future<List<Groups>> getGroups() async {
-    var res = await http.get(
-        Uri.parse(
-            "http://api.fucku.tech/getFilialEduGroups?filial=$selectedFilial&year=$selectedYear"),
-        headers: {"Accept": "application/json"});
-
-    setState(() {
-      var resBody = json.decode(utf8.decode(res.bodyBytes));
-      dataGroups = resBody['result']['return']['EduGroup'];
-      _groups = [];
-      _groups =
-          (dataGroups).map<Groups>((item) => Groups.fromJson(item)).toList();
-    });
-    return _groups;
-  }
 
   bool _validateAndSave() {
     final form = _formKey.currentState;
@@ -118,9 +62,8 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
           userId = await widget.auth.signIn(_email, _password);
           print('Signed in: $userId');
         } else {
-          _dataOfStudent =
-              'dogovor=$_dogovor&filial=$selectedFilial&group=$selectedGroup';
-          userId = await widget.auth.signUp(_email, _dataOfStudent, _password);
+          _dataOfUser = '$_fio';
+          userId = await widget.auth.signUp(_email, _dataOfUser, _password);
           print('Signed in: $userId');
         }
         setState(() {
@@ -182,14 +125,10 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
   void initState() {
     _errorMessage = "";
     _isLoading = false;
-    this.getFilials();
-    this.getYears();
     super.initState();
   }
 
   void _changeFormToSignUp() {
-    this.getFilials();
-    this.getYears();
     _formKey.currentState.reset();
     _errorMessage = "";
     setState(() {
@@ -256,21 +195,16 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                 ? new Column(
                     children: <Widget>[
                       _showPrimaryButton(),
-                      _showSupportButton(),
                     ],
                   )
                 : new Column(
                     children: <Widget>[
                       _showEmailInput(),
-                      _showDogovorInput(),
+                      _showFIOInput(),
                       _showPasswordInput(),
-                      _showDropDownButtonFilial(),
-                      _showDropDownButtonYear(),
-                      _showDropDownButtonGroup(),
                       _showRulesButton(),
                       _showPrimaryButton(),
                       _showSecondaryButton(),
-                      _showSupportButton(),
                       _showErrorMessage(),
                     ],
                   ),
@@ -313,7 +247,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
         child: CircleAvatar(
           backgroundColor: Color(0x000000000),
           radius: 100.0,
-          child: Image.asset('image/Logo.png', fit: BoxFit.cover),
+          child: Image.asset('image/Logo_100.png', fit: BoxFit.cover),
         ),
       ),
     );
@@ -341,7 +275,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
     );
   }
 
-  Widget _showDogovorInput() {
+  Widget _showFIOInput() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
       child: _formMode == FormMode.SIGNUP
@@ -350,14 +284,14 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
               keyboardType: TextInputType.number,
               autofocus: false,
               decoration: new InputDecoration(
-                  hintText: 'Номер договора',
+                  hintText: 'ФИО',
                   icon: new Icon(
                     Icons.mail,
                     color: Colors.grey,
                   )),
               validator: (value) =>
-                  value.isEmpty ? 'Номер договора не может быть пустым' : null,
-              onSaved: (value) => _dogovor = value,
+                  value.isEmpty ? 'Поле не может быть пустым' : null,
+              onSaved: (value) => _fio = value,
             )
           : new Container(),
     );
@@ -397,38 +331,6 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
     );
   }
 
-  Widget _showSupportButton() {
-    return new Padding(
-        padding: _loginMode == FormMode.EMPTY
-            ? EdgeInsets.fromLTRB(0.0, 30.0, 0.0, 0.0)
-            : EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-        child: SizedBox(
-            width: 350.0,
-            height: 40.0,
-            child: _loginMode == FormMode.EMPTY
-                ? new RaisedButton(
-                    elevation: 5.0,
-                    shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(30.0)),
-                    color: Colors.white,
-                    hoverColor: Color(0xFFB92139),
-                    child: new Text('Посмотреть расписание',
-                        style: new TextStyle(
-                            fontSize: 20.0, color: Color(0xFFB92139))),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/chois');
-                    })
-                : new FlatButton(
-                    child: _formMode == FormMode.LOGIN
-                        ? new Text('Посмотреть расписание',
-                            style: new TextStyle(
-                                fontSize: 18.0, fontWeight: FontWeight.w300))
-                        : new Container(),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/chois');
-                    })));
-  }
-
   Widget _showPrimaryButton() {
     return new Padding(
         padding: _formMode == FormMode.LOGIN
@@ -455,150 +357,10 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                               fontSize: 20.0, color: Colors.white)),
               onPressed: _loginMode == FormMode.EMPTY
                   ? _changeloginMode
-                  : _formMode == FormMode.LOGIN || selectedGroup != null
+                  : _formMode == FormMode.LOGIN
                       ? _validateAndSubmit
                       : null),
         ));
-  }
-
-  Widget _showDropDownButtonFilial() {
-    return _formMode == FormMode.LOGIN || _years == null || _filials == null
-        ? new Container()
-        : Padding(
-            padding: EdgeInsets.fromLTRB(40.0, 0.0, 0.0, 0.0),
-            child: SizedBox(
-                width: shw,
-                height: 60.0,
-                child: new DropdownButton<String>(
-                  underline: Container(
-                    height: 1,
-                    color: Colors.grey,
-                  ),
-                  hint: new Text("Выберите филиал",
-                      overflow: TextOverflow.fade,
-                      style: TextStyle(
-                        color: Colors.grey,
-                        //  fontSize: 20,
-                        // fontWeight: FontWeight.w300
-                      )),
-                  value: selectedFilial,
-                  onChanged: (String newValue) {
-                    setState(() {
-                      selectedFilial = newValue;
-                      selectedGroup = null;
-                      _groups = null;
-                    });
-                    if (selectedYear != null) {
-                      getGroups();
-                    }
-                    print(selectedFilial);
-                  },
-                  isDense: false,
-                  isExpanded: true,
-                  items: _filials.map((Filials map) {
-                    return new DropdownMenuItem<String>(
-                      value: map.filialID,
-                      child: new Text(map.filialName,
-                          style: TextStyle(
-                              color: Colors.black,
-                              //   fontSize: 20,
-                              fontWeight: FontWeight.normal)),
-                    );
-                  }).toList(),
-                )));
-  }
-
-  Widget _showDropDownButtonYear() {
-    return _formMode == FormMode.LOGIN || _years == null || _filials == null
-        ? new Container()
-        : Padding(
-            padding: EdgeInsets.fromLTRB(40.0, 0.0, 0.0, 0.0),
-            child: new SizedBox(
-              width: shw,
-              height: 60.0,
-              child: new DropdownButton<String>(
-                underline: Container(
-                  height: 1,
-                  color: Colors.grey,
-                ),
-                hint: new Text("Выберите год начала обучения",
-                    overflow: TextOverflow.fade,
-                    style: TextStyle(
-                      color: Colors.grey,
-                      //   fontSize: 20,
-                      //  fontWeight: FontWeight.w300
-                    )),
-                value: selectedYear,
-                onChanged: (String newValue) {
-                  setState(() {
-                    selectedYear = newValue;
-                    selectedGroup = null;
-                    _groups = null;
-                  });
-                  if (selectedFilial != null) {
-                    getGroups();
-                  }
-                  print(selectedYear);
-                },
-                isDense: false,
-                isExpanded: true,
-                items: _years.map((Years map) {
-                  return new DropdownMenuItem<String>(
-                    value: map.yearID,
-                    child: new Text(map.yearName,
-                        style: TextStyle(
-                            color: Colors.black,
-                            //  fontSize: 20,
-                            fontWeight: FontWeight.normal)),
-                  );
-                }).toList(),
-              ),
-            ));
-  }
-
-  Widget _showDropDownButtonGroup() {
-    return _formMode == FormMode.LOGIN ||
-            selectedYear == null ||
-            selectedFilial == null ||
-            _groups == null
-        ? new Container()
-        : Padding(
-            padding: EdgeInsets.fromLTRB(40.0, 0.0, 0.0, 0.0),
-            child: new SizedBox(
-              width: shw,
-              height: 60.0,
-              child: new DropdownButton<String>(
-                underline: Container(
-                  height: 1,
-                  color: Colors.grey,
-                ),
-                hint: new Text("Выберите группу",
-                    style: TextStyle(
-                      color: Colors.grey,
-                      //   fontSize: 20,
-                      //  fontWeight: FontWeight.w300
-                    )),
-                value: selectedGroup,
-                onChanged: (String newValue) {
-                  setState(() {
-                    selectedGroup = newValue;
-                  });
-                  print(selectedGroup);
-                },
-                isDense: false,
-                isExpanded: true,
-                items: _groups.map((Groups map) {
-                  return new DropdownMenuItem<String>(
-                    value: map.groupID,
-                    child: new Text(map.groupName,
-                        style: TextStyle(
-                            color: Colors.black,
-                            //    fontSize: 20,
-                            fontWeight: FontWeight.normal)),
-                  );
-                }).toList(),
-              ),
-            ));
   }
 
   Widget _showRulesButton() {
@@ -614,35 +376,5 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
               _launchURL();
             },
           );
-  }
-}
-
-class Filials {
-  final String filialID;
-  final String filialName;
-
-  Filials({this.filialID, this.filialName});
-  factory Filials.fromJson(Map<String, dynamic> json) {
-    return new Filials(filialID: json['GUID'], filialName: json['Name']);
-  }
-}
-
-class Years {
-  final String yearID;
-  final String yearName;
-
-  Years({this.yearID, this.yearName});
-  factory Years.fromJson(Map<String, dynamic> json) {
-    return new Years(yearID: json['GUID'], yearName: json['Name']);
-  }
-}
-
-class Groups {
-  final String groupID;
-  final String groupName;
-
-  Groups({this.groupID, this.groupName});
-  factory Groups.fromJson(Map<String, dynamic> json) {
-    return new Groups(groupID: json['GUID'], groupName: json['Name']);
   }
 }

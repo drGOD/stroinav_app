@@ -171,7 +171,7 @@ class _TemproryPageState extends State<TemproryPage> {
                   child: CircleAvatar(
                     backgroundColor: Colors.transparent,
                     radius: shw / 4.6,
-                    child: Image.asset('image/Logo.png', fit: BoxFit.cover),
+                    child: Image.asset('image/Logo_100.png', fit: BoxFit.cover),
                   ))
             ]));
   }

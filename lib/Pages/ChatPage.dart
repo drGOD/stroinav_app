@@ -59,14 +59,6 @@ class _PageOneState extends State<PageOne> {
                                   )),
                             ],
                           ),
-                          Container(
-                            constraints: BoxConstraints.expand(
-                              height: 24,
-                              width: 240,
-                            ),
-                            child: Image.asset('image/Logo.png',
-                                fit: BoxFit.contain),
-                          ),
                         ]),
                   ])),
               Padding(

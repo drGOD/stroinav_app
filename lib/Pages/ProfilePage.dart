@@ -46,14 +46,6 @@ class _PageFourState extends State<PageFour> {
                         child: Column(
                           children: [
                             SizedBox(height: 10),
-                            Container(
-                              constraints: BoxConstraints.expand(
-                                height: 24,
-                                width: 240,
-                              ),
-                              child: Image.asset('image/Logo.png',
-                                  fit: BoxFit.contain),
-                            ),
                             QrImage(
                               data: 'Иванов Иван Иванович 182186',
                               gapless: true,
