@@ -23,23 +23,6 @@ class _PageTwoState extends State<PageTwo> {
   Geolocator _geolocator;
   Position _position;
 
-  void checkPermission() {
-    _geolocator.checkGeolocationPermissionStatus().then((status) {
-      print('status: $status');
-    });
-    _geolocator
-        .checkGeolocationPermissionStatus(
-            locationPermission: GeolocationPermission.locationAlways)
-        .then((status) {
-      print('always status: $status');
-    });
-    _geolocator.checkGeolocationPermissionStatus(
-        locationPermission: GeolocationPermission.locationWhenInUse)
-      ..then((status) {
-        print('whenInUse status: $status');
-      });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -48,7 +31,6 @@ class _PageTwoState extends State<PageTwo> {
     LocationOptions locationOptions =
         LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 1);
 
-    checkPermission();
     updateLocation();
 
     StreamSubscription positionStream = _geolocator
