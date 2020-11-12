@@ -51,8 +51,8 @@ class _NavBarPageState extends State<NavBarPage> {
 
   PageOne one;
   PageTwo two;
-  PageThree three;
-  PageFour four;
+  PageThree four;
+  PageProfile three;
 
   List<Widget> pages;
   Widget currentPage;
@@ -62,26 +62,27 @@ class _NavBarPageState extends State<NavBarPage> {
 
   @override
   void initState() {
-    two = PageTwo(
-        /*userId: userId,
-      auth: auth,
-      onSignedOut: onSignedOut,*/
-        );
-    three = PageThree(
-        /*userId: userId,
-      auth: auth,
-      onSignedOut: onSignedOut,*/
-        );
-    four = PageFour(
-        /*userId: userId,
-      auth: auth,
-      onSignedOut: onSignedOut,*/
-        );
     one = PageOne(
         /*userId: userId,
       auth: auth,
       onSignedOut: onSignedOut,*/
         );
+    two = PageTwo(
+        /*userId: userId,
+      auth: auth,
+      onSignedOut: onSignedOut,*/
+        );
+    three = PageProfile(
+        /*userId: userId,
+      auth: auth,
+      onSignedOut: onSignedOut,*/
+        );
+    four = PageThree(
+        /*userId: userId,
+      auth: auth,
+      onSignedOut: onSignedOut,*/
+        );
+
     pages = [one, two, three, four];
 
     currentPage = three;
@@ -101,10 +102,9 @@ class _NavBarPageState extends State<NavBarPage> {
   //Страница+бар
   Widget _pageContext() {
     return PageStorage(
-      child:
-          currentPage == four || currentPage == one //fixme убрать одну страницу
-              ? currentPage //иссключение верхнего меню
-              : Stack(children: [currentPage, _topBar()]),
+      child: currentPage == three //fixme убрать одну страницу
+          ? currentPage //иссключение верхнего меню
+          : Stack(children: [currentPage, _topBar()]),
       bucket: bucket,
     );
   }
@@ -129,12 +129,12 @@ class _NavBarPageState extends State<NavBarPage> {
           title: Text("Площадка"),
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.timer),
-          title: Text('Учет рабочего времени'),
-        ),
-        BottomNavigationBarItem(
           icon: Icon(Icons.credit_card_outlined),
           title: Text('Профиль'),
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.timer),
+          title: Text('Учет рабочего времени'),
         ),
       ],
       type: BottomNavigationBarType.shifting,
