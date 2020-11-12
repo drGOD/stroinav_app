@@ -200,7 +200,10 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                 : new Column(
                     children: <Widget>[
                       _showEmailInput(),
+                      _showNumberInput(),
                       _showFIOInput(),
+                      _showSpecInput(),
+                      _showRabInput(),
                       _showPasswordInput(),
                       _showRulesButton(),
                       _showPrimaryButton(),
@@ -281,12 +284,75 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
       child: _formMode == FormMode.SIGNUP
           ? new TextFormField(
               maxLines: 1,
-              keyboardType: TextInputType.number,
               autofocus: false,
               decoration: new InputDecoration(
                   hintText: 'ФИО',
                   icon: new Icon(
-                    Icons.mail,
+                    Icons.person,
+                    color: Colors.grey,
+                  )),
+              validator: (value) =>
+                  value.isEmpty ? 'Поле не может быть пустым' : null,
+              onSaved: (value) => _fio = value,
+            )
+          : new Container(),
+    );
+  }
+
+  Widget _showNumberInput() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+      child: _formMode == FormMode.SIGNUP
+          ? new TextFormField(
+              maxLines: 1,
+              keyboardType: TextInputType.number,
+              autofocus: false,
+              decoration: new InputDecoration(
+                  hintText: 'Телефон',
+                  icon: new Icon(
+                    Icons.phone,
+                    color: Colors.grey,
+                  )),
+              validator: (value) =>
+                  value.isEmpty ? 'Поле не может быть пустым' : null,
+              onSaved: (value) => _fio = value,
+            )
+          : new Container(),
+    );
+  }
+
+  Widget _showSpecInput() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+      child: _formMode == FormMode.SIGNUP
+          ? new TextFormField(
+              maxLines: 1,
+              autofocus: false,
+              decoration: new InputDecoration(
+                  hintText: 'Специальность',
+                  icon: new Icon(
+                    Icons.engineering,
+                    color: Colors.grey,
+                  )),
+              validator: (value) =>
+                  value.isEmpty ? 'Поле не может быть пустым' : null,
+              onSaved: (value) => _fio = value,
+            )
+          : new Container(),
+    );
+  }
+
+  Widget _showRabInput() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+      child: _formMode == FormMode.SIGNUP
+          ? new TextFormField(
+              maxLines: 1,
+              autofocus: false,
+              decoration: new InputDecoration(
+                  hintText: 'Работодатель',
+                  icon: new Icon(
+                    Icons.reduce_capacity,
                     color: Colors.grey,
                   )),
               validator: (value) =>
