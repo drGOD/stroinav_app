@@ -1,26 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:stroinav_app/services/authentication.dart';
 
 class PageThree extends StatefulWidget {
-  PageThree({Key key, this.auth, this.userId, this.onSignedOut})
-      : super(key: key);
+  PageThree({Key key, this.userId, this.onSignedOut}) : super(key: key);
 
-  final BaseAuth auth;
   final VoidCallback onSignedOut;
   final String userId;
 
   @override
   _PageThreeState createState() => _PageThreeState(
         userId: userId,
-        auth: auth,
         onSignedOut: onSignedOut,
       );
 }
 
 class _PageThreeState extends State<PageThree> {
-  _PageThreeState({this.auth, this.userId, this.onSignedOut});
+  _PageThreeState({this.userId, this.onSignedOut});
 
-  final BaseAuth auth;
   final VoidCallback onSignedOut;
   final String userId;
 

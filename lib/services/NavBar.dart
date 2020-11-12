@@ -4,34 +4,34 @@ import 'package:stroinav_app/pages/TimePage.dart';
 import 'package:stroinav_app/pages/ProfilePage.dart';
 import 'package:stroinav_app/pages/MapPage.dart';
 import 'package:stroinav_app/pages/ChatPage.dart';
-import 'package:stroinav_app/services/authentication.dart';
+//import 'package:stroinav_app/services/authentication.dart';
 
 class NavBarPage extends StatefulWidget {
-  NavBarPage({Key key, this.auth, this.userId, this.onSignedOut})
+  NavBarPage({Key key, /*this.auth,*/ this.userId, this.onSignedOut})
       : super(key: key);
 
-  final BaseAuth auth;
+  //final BaseAuth auth;
   final VoidCallback onSignedOut;
   final String userId;
 
   @override
   State<StatefulWidget> createState() => new _NavBarPageState(
         userId: userId,
-        auth: auth,
+        //auth: auth,
         onSignedOut: onSignedOut,
       );
 }
 
 class _NavBarPageState extends State<NavBarPage> {
-  _NavBarPageState({this.auth, this.userId, this.onSignedOut});
+  _NavBarPageState({/*this.auth,*/ this.userId, this.onSignedOut});
 
-  final BaseAuth auth;
+  //final BaseAuth auth;
   final VoidCallback onSignedOut;
   final String userId;
 
   _signOut() async {
     try {
-      await widget.auth.signOut();
+      //await widget.auth.signOut();
       widget.onSignedOut();
     } catch (e) {
       print(e);

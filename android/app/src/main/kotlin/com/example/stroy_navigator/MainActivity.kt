@@ -1,4 +1,4 @@
-package com.example.stroinav_app
+package com.example.stroy_navigator
 
 import io.flutter.embedding.android.FlutterActivity
 

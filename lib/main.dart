@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'services/authentication.dart';
-import 'pages/root_page.dart';
-import 'package:stroinav_app/pages/TimePage.dart';
-import 'package:stroinav_app/services/Something.dart';
+import 'package:stroinav_app/services/NavBar.dart';
 
 class MainScreen extends StatelessWidget {
   @override
@@ -14,10 +11,9 @@ class MainScreen extends StatelessWidget {
         theme: new ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: new RootPage(auth: new Auth()),
+        home: new NavBarPage(), //RootPage(auth: new Auth()),
         routes: {
-          '/Something': (BuildContext context) => TemproryPage(),
-          '/R': (BuildContext context) => PageThree(),
+          '/Something': (BuildContext context) => NavBarPage(),
         });
   }
 }

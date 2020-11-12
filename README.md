@@ -1,4 +1,4 @@
-# stroinav_app
+# stroy_navigator
 
 A new Flutter application.
 

@@ -1,26 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:stroinav_app/services/authentication.dart';
 
 class PageOne extends StatefulWidget {
-  PageOne({Key key, this.auth, this.userId, this.onSignedOut})
-      : super(key: key);
+  PageOne({Key key, this.userId, this.onSignedOut}) : super(key: key);
 
-  final BaseAuth auth;
   final VoidCallback onSignedOut;
   final String userId;
 
   @override
   _PageOneState createState() => _PageOneState(
         userId: userId,
-        auth: auth,
         onSignedOut: onSignedOut,
       );
 }
 
 class _PageOneState extends State<PageOne> {
-  _PageOneState({this.auth, this.userId, this.onSignedOut});
+  _PageOneState({this.userId, this.onSignedOut});
 
-  final BaseAuth auth;
   final VoidCallback onSignedOut;
   final String userId;
 
