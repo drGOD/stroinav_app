@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:sliding_button/sliding_button.dart';
 
 class PageProfile extends StatefulWidget {
   PageProfile({Key key, @required this.startStatus, this.onWorkStatus})
@@ -128,7 +129,7 @@ class _PageProfileState extends State<PageProfile> {
                         padding: new EdgeInsets.all(2.0),
                         color: Color(0xFF255781),
                         child: new Text(
-                          'SOS',
+                          'SOSer',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontSize: 25,
