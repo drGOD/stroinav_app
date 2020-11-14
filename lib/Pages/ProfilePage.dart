@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:slide_to_act/slide_to_act.dart';
 import 'package:sliding_button/sliding_button.dart';
 
 class PageProfile extends StatefulWidget {
@@ -140,7 +141,7 @@ class _PageProfileState extends State<PageProfile> {
   //экран сос
   Widget _sosWindow() {
     return Scaffold(
-      backgroundColor: Color(0xFF263238),
+      backgroundColor: Color(0xFF003e77),
       body: Container(
         padding: EdgeInsets.fromLTRB(
           20,
@@ -163,7 +164,7 @@ class _PageProfileState extends State<PageProfile> {
           SizedBox(
             height: 15,
           ),
-          _sosButton()
+          _sosSlidButton()
         ]),
       ),
     );
@@ -218,6 +219,30 @@ class _PageProfileState extends State<PageProfile> {
           ),
         ),
       ]),
+    );
+  }
+
+  Widget _sosSlidButton() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: SlideAction(
+        onSubmit: () {
+          Future.delayed(
+            Duration(seconds: 1),
+            () => {_ssSOS(), _changeSos()},
+          );
+        },
+        alignment: Alignment.centerRight,
+        child: Text(
+          'Отмена SOS',
+          style: TextStyle(
+            color: Colors.red,
+          ),
+        ),
+        innerColor: Colors.red,
+        outerColor: Colors.white,
+        sliderButtonIcon: Icon(Icons.lock),
+      ),
     );
   }
 
