@@ -134,7 +134,6 @@ class _PageProfileState extends State<PageProfile> {
           onTap: () {
             _ssSmena();
             print(startStatus);
-            NavBarPage();
           },
           child: new Container(
             padding: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
@@ -161,9 +160,9 @@ class _PageProfileState extends State<PageProfile> {
                         padding: new EdgeInsets.all(2.0),
                         color: Color(0xFF255781),
                         child: new Text(
-                          //_start == FormMode.Start
-                          // ? 'Начать смену'
-                          'Закончить смену',
+                          startStatus == 'Stop'
+                              ? 'Начать смену'
+                              : 'Закончить смену',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontSize: 25,

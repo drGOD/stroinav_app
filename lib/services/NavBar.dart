@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:async';
+import 'package:http/http.dart' as http;
 
 import 'package:stroinav_app/pages/TimePage.dart';
 import 'package:stroinav_app/pages/ProfilePage.dart';
@@ -40,12 +41,13 @@ class _NavBarPageState extends State<NavBarPage> {
   StartStatus startStatus = StartStatus.Stop;
   String _startStatus = "Stop";
 
+  //смена статуса смены
   void onWorkStatus() {
     setState(() {
       startStatus == StartStatus.Start
           ? {startStatus = StartStatus.Stop, _startStatus = "Stop"}
           : {startStatus = StartStatus.Start, _startStatus = "Start"};
-      print('$_position');
+      print('$_startStatus');
       PageProfile(
         onWorkStatus: onWorkStatus,
         startStatus: _startStatus,
@@ -53,7 +55,6 @@ class _NavBarPageState extends State<NavBarPage> {
     });
   }
 
-  List data;
   double shw;
   String url;
 
@@ -76,8 +77,10 @@ class _NavBarPageState extends State<NavBarPage> {
 
   Geolocator _geolocator;
   Position _position;
+
   Timer _everySecond;
 
+  //функция получения координат
   Future<String> getGPS() async {
     _geolocator = Geolocator();
     LocationOptions locationOptions = LocationOptions(
@@ -96,28 +99,13 @@ class _NavBarPageState extends State<NavBarPage> {
 
   @override
   void initState() {
-    one = PageOne(
-        /*userId: userId,
-      auth: auth,
-      onSignedOut: onSignedOut,*/
-        );
-    two = PageTwo(
-        /*userId: _textPosition,
-      auth: auth,
-      onSignedOut: onSignedOut,*/
-        );
+    one = PageOne();
+    two = PageTwo();
     three = PageProfile(
       onWorkStatus: onWorkStatus,
       startStatus: _startStatus,
-      /*userId: userId,
-      auth: auth,
-      onSignedOut: onSignedOut,*/
     );
-    four = PageThree(
-        /*userId: userId,
-      auth: auth,
-      onSignedOut: onSignedOut,*/
-        );
+    four = PageThree();
 
     pages = [one, two, three, four];
 
@@ -128,7 +116,18 @@ class _NavBarPageState extends State<NavBarPage> {
     getGPS();
     _everySecond = Timer.periodic(Duration(seconds: 10), (Timer t) {
       setState(() {
-        print(_position);
+        startStatus == StartStatus.Start
+            ? {
+                print(
+                    '${_position != null ? _position.latitude.toString() : '0'}'),
+                print(
+                    '${_position != null ? _position.longitude.toString() : '0'}'),
+                postGPSData(
+                    '2',
+                    '${_position != null ? _position.latitude.toString() : '0'}',
+                    '${_position != null ? _position.longitude.toString() : '0'}')
+              }
+            : null;
       });
     });
   }
@@ -235,4 +234,15 @@ class _NavBarPageState extends State<NavBarPage> {
       ],
     );
   }
+}
+
+Future postGPSData(String uID, String lat, String lng) async {
+  final http.Response response = await http
+      .post('http://185.5.54.22:1337/locations', headers: <String, String>{
+    'Accept': 'application/json',
+  }, body: {
+    'uID': '2',
+    'location.lat': lat,
+    'location.lng': lng
+  });
 }
