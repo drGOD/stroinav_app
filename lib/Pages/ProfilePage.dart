@@ -129,7 +129,7 @@ class _PageProfileState extends State<PageProfile> {
                         padding: new EdgeInsets.all(2.0),
                         color: Color(0xFF255781),
                         child: new Text(
-                          'SOSer',
+                          'SOS',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontSize: 25,
