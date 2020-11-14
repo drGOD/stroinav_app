@@ -14,9 +14,21 @@ Future postGPSData(String uID, String lat, String lng) async {
       .post('http://185.5.54.22:1337/locations', headers: <String, String>{
     'Accept': 'application/json',
   }, body: {
-    'uID': '2',
+    'uID': '1',
     'location.lat': lat,
     'location.lng': lng
+  });
+}
+
+Future postGPSDataSOS(String uID, String lat, String lng) async {
+  final http.Response response =
+      await http.post('http://185.5.54.22:1337/sos', headers: <String, String>{
+    'Accept': 'application/json',
+  }, body: {
+    'uID': '1',
+    'location.lat': lat,
+    'location.lng': lng,
+    'type': '1'
   });
 }
 
@@ -45,7 +57,10 @@ class _NavBarPageState extends State<NavBarPage> {
   final String userId;
 
   StartStatus startStatus = StartStatus.Stop;
+  StartStatus startStatusSOS = StartStatus.Stop;
+
   String _startStatus = 'Stop';
+  String _startStatusSOS = 'Stop';
 
   //смена статуса смены
   void onWorkStatus() {
@@ -53,7 +68,18 @@ class _NavBarPageState extends State<NavBarPage> {
       startStatus == StartStatus.Start
           ? {startStatus = StartStatus.Stop, _startStatus = "Stop"}
           : {startStatus = StartStatus.Start, _startStatus = "Start"};
-      print('$_startStatus');
+      print('$_startStatus work');
+      initStatePage();
+      return currentPage = pages[2];
+    });
+  }
+
+  void onSOSStatus() {
+    setState(() {
+      startStatusSOS == StartStatus.Start
+          ? {startStatusSOS = StartStatus.Stop, _startStatusSOS = "Stop"}
+          : {startStatusSOS = StartStatus.Start, _startStatusSOS = "Start"};
+      print('$_startStatusSOS sos');
       initStatePage();
       return currentPage = pages[2];
     });
@@ -107,6 +133,8 @@ class _NavBarPageState extends State<NavBarPage> {
     three = new PageProfile(
       onWorkStatus: onWorkStatus,
       startStatus: _startStatus,
+      onSOSStatus: onSOSStatus,
+      startStatusSOS: _startStatusSOS,
     );
     four = PageThree();
 
@@ -124,13 +152,16 @@ class _NavBarPageState extends State<NavBarPage> {
     _everySecond = Timer.periodic(Duration(seconds: 10), (Timer t) {
       setState(() {
         startStatus == StartStatus.Start
+            ? postGPSData(
+                '2',
+                '${_position != null ? _position.latitude.toString() : '0'}',
+                '${_position != null ? _position.longitude.toString() : '0'}')
+            : null;
+        startStatusSOS == StartStatus.Start
             ? {
-                print(
-                    '${_position != null ? _position.latitude.toString() : '0'}'),
-                print(
-                    '${_position != null ? _position.longitude.toString() : '0'}'),
-                postGPSData(
-                    '2',
+                print('object'),
+                postGPSDataSOS(
+                    '1',
                     '${_position != null ? _position.latitude.toString() : '0'}',
                     '${_position != null ? _position.longitude.toString() : '0'}')
               }

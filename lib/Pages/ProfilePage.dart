@@ -3,26 +3,40 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:sliding_button/sliding_button.dart';
 
 class PageProfile extends StatefulWidget {
-  PageProfile({Key key, @required this.startStatus, this.onWorkStatus})
+  PageProfile(
+      {Key key,
+      @required this.startStatus,
+      this.onWorkStatus,
+      @required this.startStatusSOS,
+      this.onSOSStatus})
       : super(key: key);
 
   final VoidCallback onWorkStatus;
   final String startStatus;
+  final VoidCallback onSOSStatus;
+  final String startStatusSOS;
 
   @override
   _PageProfileState createState() => _PageProfileState(
-        startStatus: startStatus,
-        onWorkStatus: onWorkStatus,
-      );
+      startStatus: startStatus,
+      onWorkStatus: onWorkStatus,
+      onSOSStatus: onSOSStatus,
+      startStatusSOS: startStatusSOS);
 }
 
-enum FormMode { Start, Stop }
+enum FormSmena { Start, Stop }
 
 class _PageProfileState extends State<PageProfile> {
-  _PageProfileState({@required this.startStatus, this.onWorkStatus});
+  _PageProfileState(
+      {@required this.startStatus,
+      this.onWorkStatus,
+      @required this.startStatusSOS,
+      this.onSOSStatus});
 
   final VoidCallback onWorkStatus;
   String startStatus;
+  final VoidCallback onSOSStatus;
+  String startStatusSOS;
 
   _ssSmena() async {
     try {
@@ -32,21 +46,44 @@ class _PageProfileState extends State<PageProfile> {
     }
   }
 
-  FormMode _start = FormMode.Stop;
+  _ssSOS() async {
+    try {
+      widget.onSOSStatus();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  FormSmena _startSmena = FormSmena.Stop;
+  FormSmena _startSos = FormSmena.Stop;
 
   @override
   void initState() {
     //приведение статуса работы стр к статусу приложения
-    startStatus == 'Stop' ? _start = FormMode.Stop : _start = FormMode.Start;
+    startStatus == 'Stop'
+        ? _startSmena = FormSmena.Stop
+        : _startSmena = FormSmena.Start;
+    startStatusSOS == 'Stop'
+        ? _startSos = FormSmena.Stop
+        : _startSos = FormSmena.Start;
     super.initState();
   }
 
   //смена статуса работы на странице
   void _changeStart() {
     setState(() {
-      _start == FormMode.Start
-          ? _start = FormMode.Stop
-          : _start = FormMode.Start;
+      _startSmena == FormSmena.Start
+          ? _startSmena = FormSmena.Stop
+          : _startSmena = FormSmena.Start;
+    });
+  }
+
+  //смена статуса сос на странице
+  void _changeSos() {
+    setState(() {
+      _startSos == FormSmena.Start
+          ? _startSos = FormSmena.Stop
+          : _startSos = FormSmena.Start;
     });
   }
 
@@ -56,45 +93,80 @@ class _PageProfileState extends State<PageProfile> {
     shw = MediaQuery.of(context).size.width;
     return Scaffold(
         backgroundColor: Color(0xFF255781),
-        body: ListView(
-          children: [
-            Container(
-              padding: EdgeInsets.all(20.0),
-              child: Column(children: [
-                Material(
-                    elevation: 4.0,
-                    borderRadius: BorderRadius.circular(15.0),
-                    child: Center(
-                      child: Column(
-                        children: [
-                          SizedBox(height: 10),
-                          _qrBlock(),
-                          Padding(
-                              padding:
-                                  EdgeInsets.fromLTRB(20.0, 20.0, 10.0, 10.0),
-                              child: Column(children: [
-                                _surnameBlock(),
-                                _nameBlock(),
-                                _typeNumber(),
-                                _groupNumber(),
-                                _tabelNumber(),
-                                _personalNumber()
-                              ]))
-                        ],
-                      ),
-                    )),
-                SizedBox(
-                  height: 15,
-                ),
-                _smenaButton(),
-                SizedBox(
-                  height: 15,
-                ),
-                _sosButton()
-              ]),
+        body: _startSos == FormSmena.Stop ? _normalWindow() : _sosWindow());
+  }
+
+  Widget _normalWindow() {
+    return ListView(
+      children: [
+        Container(
+          padding: EdgeInsets.all(20.0),
+          child: Column(children: [
+            Material(
+                elevation: 4.0,
+                borderRadius: BorderRadius.circular(15.0),
+                child: Center(
+                  child: Column(
+                    children: [
+                      SizedBox(height: 10),
+                      _qrBlock(),
+                      Padding(
+                          padding: EdgeInsets.fromLTRB(20.0, 20.0, 10.0, 10.0),
+                          child: Column(children: [
+                            _surnameBlock(),
+                            _nameBlock(),
+                            _typeNumber(),
+                            _groupNumber(),
+                            _tabelNumber(),
+                            _personalNumber()
+                          ]))
+                    ],
+                  ),
+                )),
+            SizedBox(
+              height: 15,
             ),
-          ],
-        ));
+            _smenaButton(),
+            SizedBox(
+              height: 15,
+            ),
+            _sosButton()
+          ]),
+        ),
+      ],
+    );
+  }
+
+  //экран сос
+  Widget _sosWindow() {
+    return Scaffold(
+      backgroundColor: Color(0xFF263238),
+      body: Container(
+        padding: EdgeInsets.fromLTRB(
+          20,
+          60,
+          20,
+          0,
+        ),
+        child:
+            Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+          new Text('Сигнал SOS',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white)),
+          SizedBox(
+            height: 15,
+          ),
+          Icon(Icons.warning, color: Colors.red, size: 200.0),
+          SizedBox(
+            height: 15,
+          ),
+          _sosButton()
+        ]),
+      ),
+    );
   }
 
   Widget _sosButton() {
@@ -103,7 +175,10 @@ class _PageProfileState extends State<PageProfile> {
       padding: new EdgeInsets.fromLTRB(18.0, 0.0, 18.0, 0.0),
       child: Column(children: [
         GestureDetector(
-          onTap: () {},
+          onTap: () {
+            _ssSOS();
+            _changeSos();
+          },
           child: new Container(
             padding: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
             decoration: BoxDecoration(
@@ -155,7 +230,6 @@ class _PageProfileState extends State<PageProfile> {
           onTap: () {
             _ssSmena();
             _changeStart();
-            print(startStatus);
           },
           child: new Container(
             padding: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
@@ -182,7 +256,7 @@ class _PageProfileState extends State<PageProfile> {
                         padding: new EdgeInsets.all(2.0),
                         color: Color(0xFF255781),
                         child: new Text(
-                          _start == FormMode.Stop
+                          _startSmena == FormSmena.Stop
                               ? 'Начать смену'
                               : 'Закончить смену',
                           textAlign: TextAlign.center,
