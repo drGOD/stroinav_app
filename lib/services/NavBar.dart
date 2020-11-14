@@ -8,13 +8,21 @@ import 'package:stroinav_app/pages/ProfilePage.dart';
 import 'package:stroinav_app/pages/MapPage.dart';
 import 'package:stroinav_app/pages/ChatPage.dart';
 
-//import 'package:stroinav_app/services/authentication.dart';
+//Выгрузка на сервер
+Future postGPSData(String uID, String lat, String lng) async {
+  final http.Response response = await http
+      .post('http://185.5.54.22:1337/locations', headers: <String, String>{
+    'Accept': 'application/json',
+  }, body: {
+    'uID': '2',
+    'location.lat': lat,
+    'location.lng': lng
+  });
+}
 
 class NavBarPage extends StatefulWidget {
-  NavBarPage({Key key, /*this.auth,*/ this.userId, this.onSignedOut})
-      : super(key: key);
+  NavBarPage({Key key, this.userId, this.onSignedOut}) : super(key: key);
 
-  //final BaseAuth auth;
   final VoidCallback onSignedOut;
   final String userId;
 
@@ -23,7 +31,6 @@ class NavBarPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => new _NavBarPageState(
         userId: userId,
-        //auth: auth,
         onSignedOut: onSignedOut,
       );
 }
@@ -32,14 +39,13 @@ class NavBarPage extends StatefulWidget {
 enum StartStatus { Start, Stop }
 
 class _NavBarPageState extends State<NavBarPage> {
-  _NavBarPageState({/*this.auth,*/ this.userId, this.onSignedOut});
+  _NavBarPageState({this.userId, this.onSignedOut});
 
-  //final BaseAuth auth;
   final VoidCallback onSignedOut;
   final String userId;
 
   StartStatus startStatus = StartStatus.Stop;
-  String _startStatus = "Stop";
+  String _startStatus = 'Stop';
 
   //смена статуса смены
   void onWorkStatus() {
@@ -48,11 +54,26 @@ class _NavBarPageState extends State<NavBarPage> {
           ? {startStatus = StartStatus.Stop, _startStatus = "Stop"}
           : {startStatus = StartStatus.Start, _startStatus = "Start"};
       print('$_startStatus');
-      PageProfile(
-        onWorkStatus: onWorkStatus,
-        startStatus: _startStatus,
-      );
+      initStatePage();
+      return currentPage = pages[2];
     });
+  }
+
+  //функция получения координат fixme убрать постоянное сканирование
+  Future<String> getGPS() async {
+    _geolocator = Geolocator();
+    LocationOptions locationOptions = LocationOptions(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 1,
+        timeInterval: 30000);
+    StreamSubscription positionStream = _geolocator
+        .getPositionStream(locationOptions)
+        .listen((Position position) {
+      setState(() {
+        _position = position;
+      });
+    });
+    return "Success!";
   }
 
   double shw;
@@ -80,35 +101,21 @@ class _NavBarPageState extends State<NavBarPage> {
 
   Timer _everySecond;
 
-  //функция получения координат
-  Future<String> getGPS() async {
-    _geolocator = Geolocator();
-    LocationOptions locationOptions = LocationOptions(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 1,
-        timeInterval: 30000);
-    StreamSubscription positionStream = _geolocator
-        .getPositionStream(locationOptions)
-        .listen((Position position) {
-      setState(() {
-        _position = position;
-      });
-    });
-    return "Success!";
-  }
-
-  @override
-  void initState() {
+  void initStatePage() {
     one = PageOne();
     two = PageTwo();
-    three = PageProfile(
+    three = new PageProfile(
       onWorkStatus: onWorkStatus,
       startStatus: _startStatus,
     );
     four = PageThree();
 
     pages = [one, two, three, four];
+  }
 
+  @override
+  void initState() {
+    initStatePage();
     currentPage = three;
     super.initState();
 
@@ -143,7 +150,7 @@ class _NavBarPageState extends State<NavBarPage> {
 
   //Страница+бар
   Widget _pageContext() {
-    return PageStorage(
+    return new PageStorage(
       child: currentPage == three //fixme убрать одну страницу
           ? currentPage //иссключение верхнего меню
           : Stack(children: [currentPage, _topBar()]),
@@ -234,15 +241,4 @@ class _NavBarPageState extends State<NavBarPage> {
       ],
     );
   }
-}
-
-Future postGPSData(String uID, String lat, String lng) async {
-  final http.Response response = await http
-      .post('http://185.5.54.22:1337/locations', headers: <String, String>{
-    'Accept': 'application/json',
-  }, body: {
-    'uID': '2',
-    'location.lat': lat,
-    'location.lng': lng
-  });
 }

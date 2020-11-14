@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:stroinav_app/services/NavBar.dart';
 
 class PageProfile extends StatefulWidget {
-  PageProfile({Key key, this.startStatus, this.onWorkStatus}) : super(key: key);
+  PageProfile({Key key, @required this.startStatus, this.onWorkStatus})
+      : super(key: key);
 
   final VoidCallback onWorkStatus;
-  String startStatus;
+  final String startStatus;
 
   @override
   _PageProfileState createState() => _PageProfileState(
@@ -15,8 +15,10 @@ class PageProfile extends StatefulWidget {
       );
 }
 
+enum FormMode { Start, Stop }
+
 class _PageProfileState extends State<PageProfile> {
-  _PageProfileState({this.startStatus, this.onWorkStatus});
+  _PageProfileState({@required this.startStatus, this.onWorkStatus});
 
   final VoidCallback onWorkStatus;
   String startStatus;
@@ -27,6 +29,24 @@ class _PageProfileState extends State<PageProfile> {
     } catch (e) {
       print(e);
     }
+  }
+
+  FormMode _start = FormMode.Stop;
+
+  @override
+  void initState() {
+    //приведение статуса работы стр к статусу приложения
+    startStatus == 'Stop' ? _start = FormMode.Stop : _start = FormMode.Start;
+    super.initState();
+  }
+
+  //смена статуса работы на странице
+  void _changeStart() {
+    setState(() {
+      _start == FormMode.Start
+          ? _start = FormMode.Stop
+          : _start = FormMode.Start;
+    });
   }
 
   double shw;
@@ -133,6 +153,7 @@ class _PageProfileState extends State<PageProfile> {
         GestureDetector(
           onTap: () {
             _ssSmena();
+            _changeStart();
             print(startStatus);
           },
           child: new Container(
@@ -160,7 +181,7 @@ class _PageProfileState extends State<PageProfile> {
                         padding: new EdgeInsets.all(2.0),
                         color: Color(0xFF255781),
                         child: new Text(
-                          startStatus == 'Stop'
+                          _start == FormMode.Stop
                               ? 'Начать смену'
                               : 'Закончить смену',
                           textAlign: TextAlign.center,
@@ -314,10 +335,5 @@ class _PageProfileState extends State<PageProfile> {
       gapless: true,
       size: shw / 1.5,
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 }
