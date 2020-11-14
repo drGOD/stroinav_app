@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'dart:async';
 
 import 'package:stroinav_app/pages/TimePage.dart';
 import 'package:stroinav_app/pages/ProfilePage.dart';
 import 'package:stroinav_app/pages/MapPage.dart';
 import 'package:stroinav_app/pages/ChatPage.dart';
+
 //import 'package:stroinav_app/services/authentication.dart';
 
 class NavBarPage extends StatefulWidget {
@@ -14,6 +17,8 @@ class NavBarPage extends StatefulWidget {
   final VoidCallback onSignedOut;
   final String userId;
 
+  String get count => null;
+
   @override
   State<StatefulWidget> createState() => new _NavBarPageState(
         userId: userId,
@@ -22,6 +27,9 @@ class NavBarPage extends StatefulWidget {
       );
 }
 
+//Статус работы
+enum StartStatus { Start, Stop }
+
 class _NavBarPageState extends State<NavBarPage> {
   _NavBarPageState({/*this.auth,*/ this.userId, this.onSignedOut});
 
@@ -29,13 +37,20 @@ class _NavBarPageState extends State<NavBarPage> {
   final VoidCallback onSignedOut;
   final String userId;
 
-  _signOut() async {
-    try {
-      //await widget.auth.signOut();
-      widget.onSignedOut();
-    } catch (e) {
-      print(e);
-    }
+  StartStatus startStatus = StartStatus.Stop;
+  String _startStatus = "Stop";
+
+  void onWorkStatus() {
+    setState(() {
+      startStatus == StartStatus.Start
+          ? {startStatus = StartStatus.Stop, _startStatus = "Stop"}
+          : {startStatus = StartStatus.Start, _startStatus = "Start"};
+      print('$_position');
+      PageProfile(
+        onWorkStatus: onWorkStatus,
+        startStatus: _startStatus,
+      );
+    });
   }
 
   List data;
@@ -57,8 +72,27 @@ class _NavBarPageState extends State<NavBarPage> {
   List<Widget> pages;
   Widget currentPage;
   int index = 0;
-  List<Data> dataList;
   final PageStorageBucket bucket = PageStorageBucket();
+
+  Geolocator _geolocator;
+  Position _position;
+  Timer _everySecond;
+
+  Future<String> getGPS() async {
+    _geolocator = Geolocator();
+    LocationOptions locationOptions = LocationOptions(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 1,
+        timeInterval: 30000);
+    StreamSubscription positionStream = _geolocator
+        .getPositionStream(locationOptions)
+        .listen((Position position) {
+      setState(() {
+        _position = position;
+      });
+    });
+    return "Success!";
+  }
 
   @override
   void initState() {
@@ -68,15 +102,17 @@ class _NavBarPageState extends State<NavBarPage> {
       onSignedOut: onSignedOut,*/
         );
     two = PageTwo(
-        /*userId: userId,
+        /*userId: _textPosition,
       auth: auth,
       onSignedOut: onSignedOut,*/
         );
     three = PageProfile(
-        /*userId: userId,
+      onWorkStatus: onWorkStatus,
+      startStatus: _startStatus,
+      /*userId: userId,
       auth: auth,
       onSignedOut: onSignedOut,*/
-        );
+    );
     four = PageThree(
         /*userId: userId,
       auth: auth,
@@ -86,8 +122,15 @@ class _NavBarPageState extends State<NavBarPage> {
     pages = [one, two, three, four];
 
     currentPage = three;
-
     super.initState();
+
+    //геолокация
+    getGPS();
+    _everySecond = Timer.periodic(Duration(seconds: 10), (Timer t) {
+      setState(() {
+        print(_position);
+      });
+    });
   }
 
   @override
@@ -156,7 +199,7 @@ class _NavBarPageState extends State<NavBarPage> {
               _namePersonal(),
               GestureDetector(
                   onTap: () {
-                    _signOut();
+                    //_signOut();
                   },
                   child: CircleAvatar(
                     backgroundColor: Colors.transparent,
@@ -192,11 +235,4 @@ class _NavBarPageState extends State<NavBarPage> {
       ],
     );
   }
-}
-
-class Data {
-  final int id;
-  bool expanded;
-  final String title;
-  Data(this.id, this.expanded, this.title);
 }

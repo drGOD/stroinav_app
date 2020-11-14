@@ -1,34 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:stroinav_app/services/NavBar.dart';
 
 class PageProfile extends StatefulWidget {
-  PageProfile({Key key, this.userId, this.onSignedOut}) : super(key: key);
+  PageProfile({Key key, this.startStatus, this.onWorkStatus}) : super(key: key);
 
-  final VoidCallback onSignedOut;
-  final String userId;
+  final VoidCallback onWorkStatus;
+  String startStatus;
 
   @override
   _PageProfileState createState() => _PageProfileState(
-        userId: userId,
-        onSignedOut: onSignedOut,
+        startStatus: startStatus,
+        onWorkStatus: onWorkStatus,
       );
 }
 
-enum FormMode { Start, Stop }
-
 class _PageProfileState extends State<PageProfile> {
-  _PageProfileState({this.userId, this.onSignedOut});
+  _PageProfileState({this.startStatus, this.onWorkStatus});
 
-  final VoidCallback onSignedOut;
-  final String userId;
-  FormMode _start = FormMode.Start;
+  final VoidCallback onWorkStatus;
+  String startStatus;
 
-  void _changeStart() {
-    setState(() {
-      _start == FormMode.Start
-          ? _start = FormMode.Stop
-          : _start = FormMode.Start;
-    });
+  _ssSmena() async {
+    try {
+      widget.onWorkStatus();
+    } catch (e) {
+      print(e);
+    }
   }
 
   double shw;
@@ -134,8 +132,9 @@ class _PageProfileState extends State<PageProfile> {
       child: Column(children: [
         GestureDetector(
           onTap: () {
-            _changeStart();
-            print(_start);
+            _ssSmena();
+            print(startStatus);
+            NavBarPage();
           },
           child: new Container(
             padding: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
@@ -162,9 +161,9 @@ class _PageProfileState extends State<PageProfile> {
                         padding: new EdgeInsets.all(2.0),
                         color: Color(0xFF255781),
                         child: new Text(
-                          _start == FormMode.Start
-                              ? 'Начать смену'
-                              : 'Закончить смену',
+                          //_start == FormMode.Start
+                          // ? 'Начать смену'
+                          'Закончить смену',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontSize: 25,
