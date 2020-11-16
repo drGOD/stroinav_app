@@ -1,8 +1,45 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong/latlong.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
+
+Future<List<Marker>> fetchWorkerLocation(http.Client client) async {
+  final response = await client.get('http://185.5.54.22:1337/users');
+  return compute(parseWorkerLocation, response.body);
+}
+
+List<Marker> parseWorkerLocation(String responseBody) {
+  final parsed = jsonDecode(responseBody);//.cast<Map<String, dynamic>>();
+  /* return parsed
+      .map<WorkerLocation>((json) => WorkerLocation.fromJson(json))
+      .toList();*/
+  return parsed.map<WorkerLocation>((json) {
+    return Marker(
+        width: 40.0,
+        height: 40.0,
+        point: new LatLng(55.785811, 37.4491582),
+        builder: (ctx) => Container(child: Icon(Icons.accessible_forward)));
+  });
+}
+
+class WorkerLocation {
+  final String username;
+  final String lat;
+  final String lng;
+
+  WorkerLocation({this.username, this.lat, this.lng});
+
+  factory WorkerLocation.fromJson(Map<String, dynamic> json) {
+    return WorkerLocation(
+      username: json['username'],
+      lat: json['location.lat'],
+      lng: json['location.lng'],
+    );
+  }
+}
 
 class PageTwo extends StatefulWidget {
   PageTwo({Key key, this.userId, this.onSignedOut}) : super(key: key);
@@ -22,52 +59,16 @@ class _PageTwoState extends State<PageTwo> {
 
   final VoidCallback onSignedOut;
   final String userId;
-  Geolocator _geolocator;
-  Position _position;
 
-  @override
   void initState() {
+    print(fetchWorkerLocation(http.Client()));
     super.initState();
-
-    _geolocator = Geolocator();
-    LocationOptions locationOptions =
-    LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 1);
-
-    updateLocation();
-
-    StreamSubscription positionStream = _geolocator
-        .getPositionStream(locationOptions)
-        .listen((Position position) {
-      setState(() {
-        _position = position;
-      });
-    });
-  }
-
-  void updateLocation() async {
-    try {
-      Position newPosition = await Geolocator()
-          .getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
-          .timeout(new Duration(seconds: 5));
-
-      setState(() {
-        _position = newPosition;
-      });
-    } catch (e) {
-      print('Error: ${e.toString()}');
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:
-      _map(),
-      /*Center(
-          _qrBlock(),
-          child: Text(
-              'Latitude: ${_position != null ? _position.latitude.toString() : '0'},'
-              ' Longitude: ${_position != null ? _position.longitude.toString() : '0'}')),*/
+      body: _map(),
     );
   }
 
@@ -79,20 +80,17 @@ class _PageTwoState extends State<PageTwo> {
         ),
         layers: [
           new TileLayerOptions(
-              urlTemplate: "http://tiles.maps.sputnik.ru/{z}/{x}/{y}.png"//"https://api.mapbox.com/styles/v1/unbrokenknight/ckhgk4unr0z5g19mw3yy7ctdj/wmts?access_token=pk.eyJ1IjoidW5icm9rZW5rbmlnaHQiLCJhIjoiY2toZ2gxZXBjMHpiMjM1bDZ2aGxxMjFpeCJ9.l_g8F2SX1h-xdlCEATV-ew",
-            /*additionalOptions: {
-              'accessToken': 'pk.eyJ1IjoidW5icm9rZW5rbmlnaHQiLCJhIjoiY2toZ2gxZXBjMHpiMjM1bDZ2aGxxMjFpeCJ9.l_g8F2SX1h-xdlCEATV-ew',
-              'id': 'mapbox.mapbox-streets-v8',
-            },*/
+              urlTemplate:
+              "http://tiles.maps.sputnik.ru/{z}/{x}/{y}.png" 
           ),
-          new MarkerLayerOptions(
-              markers: [
-                new Marker(
-                    width: 40.0,
-                    height: 40.0,
-                    point: new LatLng(55.785811, 37.4491582),
-                    builder: (ctx) => new Container(child: new FlutterLogo()))
-              ])]);
+          new MarkerLayerOptions(markers: [
+            new Marker(
+                width: 40.0,
+                height: 40.0,
+                point: new LatLng(55.785811, 37.4491582),
+                builder: (ctx) =>
+                    Container(child: Icon(Icons.accessible_forward))),
+          ])
+        ]);
   }
-
 }
