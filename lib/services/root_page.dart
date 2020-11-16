@@ -25,12 +25,13 @@ class _RootPageState extends State<RootPage> {
   StreamSubscription<ConnectivityResult> subscription;
 
   AuthStatus authStatus = AuthStatus.NOT_DETERMINED;
-  //AuthStatus authStatus = AuthStatus.NOT_LOGGED_IN;
+  //AuthStatus authStatus = AuthStatus.LOGGED_IN;
   String _userId = "";
   String _dogovor = "";
 
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   Future<String> _counter;
+  SharedPreferences prefs;
 
   Future<void> _incrementCounter(String status) async {
     final SharedPreferences prefs = await _prefs;
@@ -42,12 +43,24 @@ class _RootPageState extends State<RootPage> {
   }
 
   double shw = 200;
+  var s;
+
+  Future someMethod() async {
+    s = await _prefs.then((prefs) {
+      s = prefs.getString('counter');
+      print(prefs.getString('counter'));
+      return prefs.getString('counter');
+    });
+  }
+
+  someMethod2() async {}
 
   void initState() {
     super.initState();
-    _counter = _prefs.then((SharedPreferences prefs) {
-      return prefs.getString('counter');
-    });
+
+    someMethod();
+
+    print(s);
     if (_counter == 'LoggedIn') {
       print('LoggedIn');
       authStatus = AuthStatus.LOGGED_IN;
@@ -55,6 +68,7 @@ class _RootPageState extends State<RootPage> {
       print('fixme ');
       authStatus = AuthStatus.NOT_LOGGED_IN;
     }
+
     connectivity = new Connectivity();
     subscription =
         connectivity.onConnectivityChanged.listen((ConnectivityResult result) {
