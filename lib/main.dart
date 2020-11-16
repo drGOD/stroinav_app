@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-
+import 'package:stroinav_app/pages/login_signup_page.dart';
 import 'package:stroinav_app/services/NavBar.dart';
+import 'package:stroinav_app/services/root_page.dart';
 
 class MainScreen extends StatelessWidget {
   @override
@@ -11,7 +12,7 @@ class MainScreen extends StatelessWidget {
         theme: new ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: new NavBarPage(), //RootPage(auth: new Auth()),
+        home: new RootPage(), //NavBarPage(), //RootPage(auth: new Auth()),
         routes: {
           '/Something': (BuildContext context) => NavBarPage(),
         });

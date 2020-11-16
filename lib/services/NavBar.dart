@@ -20,7 +20,7 @@ Future postGPSData(String uID, String lat, String lng) async {
   });
 }
 
-Future postGPSDataSOS(String uID, String lat, String lng) async {
+Future postGPSDataSOS(String uID, String lat, String lng, String type) async {
   final http.Response response =
       await http.post('http://185.5.54.22:1337/sos', headers: <String, String>{
     'Accept': 'application/json',
@@ -28,7 +28,7 @@ Future postGPSDataSOS(String uID, String lat, String lng) async {
     'uID': '1',
     'location.lat': lat,
     'location.lng': lng,
-    'type': '1'
+    'type': type
   });
 }
 
@@ -77,9 +77,32 @@ class _NavBarPageState extends State<NavBarPage> {
   void onSOSStatus() {
     setState(() {
       startStatusSOS == StartStatus.Start
-          ? {startStatusSOS = StartStatus.Stop, _startStatusSOS = "Stop"}
-          : {startStatusSOS = StartStatus.Start, _startStatusSOS = "Start"};
+          ? {
+              startStatusSOS = StartStatus.Stop,
+              _startStatusSOS = "Stop",
+            }
+          : {
+              startStatusSOS = StartStatus.Start,
+              _startStatusSOS = "Start",
+            };
       print('$_startStatusSOS sos');
+      startStatusSOS == StartStatus.Start
+          ? {
+              print('$_position'),
+              postGPSDataSOS(
+                  '1',
+                  '${_position != null ? _position.latitude.toString() : '0'}',
+                  '${_position != null ? _position.longitude.toString() : '0'}',
+                  '1')
+            }
+          : {
+              print('$_position'),
+              postGPSDataSOS(
+                  '1',
+                  '${_position != null ? _position.latitude.toString() : '0'}',
+                  '${_position != null ? _position.longitude.toString() : '0'}',
+                  '3')
+            };
       initStatePage();
       return currentPage = pages[2];
     });
@@ -151,20 +174,11 @@ class _NavBarPageState extends State<NavBarPage> {
     getGPS();
     _everySecond = Timer.periodic(Duration(seconds: 10), (Timer t) {
       setState(() {
-        startStatus == StartStatus.Start
+        startStatus == StartStatus.Start || startStatusSOS == StartStatus.Start
             ? postGPSData(
                 '2',
                 '${_position != null ? _position.latitude.toString() : '0'}',
                 '${_position != null ? _position.longitude.toString() : '0'}')
-            : null;
-        startStatusSOS == StartStatus.Start
-            ? {
-                print('object'),
-                postGPSDataSOS(
-                    '1',
-                    '${_position != null ? _position.latitude.toString() : '0'}',
-                    '${_position != null ? _position.longitude.toString() : '0'}')
-              }
             : null;
       });
     });

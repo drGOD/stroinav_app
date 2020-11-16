@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:slide_to_act/slide_to_act.dart';
-import 'package:sliding_button/sliding_button.dart';
 
 class PageProfile extends StatefulWidget {
   PageProfile(
