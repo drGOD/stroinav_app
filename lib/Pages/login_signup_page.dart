@@ -5,8 +5,6 @@ import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 
-import 'package:stroinav_app/services/NavBar.dart';
-
 class LoginSignUpPage extends StatefulWidget {
   LoginSignUpPage({this.onSignedIn});
 
@@ -47,7 +45,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
   }
 
   _launchURL() async {
-    var url = 'https://career.ruc.su/';
+    var url = 'https://kaluga.iniciativa.app/docs/tos';
     if (await canLaunch(url)) {
       await launch(url);
     } else {

@@ -45,12 +45,20 @@ class _RootPageState extends State<RootPage> {
   double shw = 200;
   var s;
 
-  Future someMethod() async {
+  Future checkAuth() async {
     s = await _prefs.then((prefs) {
       s = prefs.getString('counter');
-      print(prefs.getString('counter'));
       return prefs.getString('counter');
     });
+    if (s == 'LoggedIn') {
+      setState(() {
+        authStatus = AuthStatus.LOGGED_IN;
+      });
+    } else {
+      setState(() {
+        authStatus = AuthStatus.NOT_LOGGED_IN;
+      });
+    }
   }
 
   someMethod2() async {}
@@ -58,16 +66,7 @@ class _RootPageState extends State<RootPage> {
   void initState() {
     super.initState();
 
-    someMethod();
-
-    print(s);
-    if (_counter == 'LoggedIn') {
-      print('LoggedIn');
-      authStatus = AuthStatus.LOGGED_IN;
-    } else {
-      print('fixme ');
-      authStatus = AuthStatus.NOT_LOGGED_IN;
-    }
+    checkAuth();
 
     connectivity = new Connectivity();
     subscription =
