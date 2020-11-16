@@ -250,7 +250,7 @@ class _NavBarPageState extends State<NavBarPage> {
               _namePersonal(),
               GestureDetector(
                   onTap: () {
-                    //_signOut();
+                    onSignedOut();
                   },
                   child: CircleAvatar(
                     backgroundColor: Colors.transparent,

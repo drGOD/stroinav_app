@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:slide_to_act/slide_to_act.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PageOne extends StatefulWidget {
   PageOne({Key key, this.userId, this.onSignedOut}) : super(key: key);
@@ -21,214 +21,56 @@ class _PageOneState extends State<PageOne> {
   final VoidCallback onSignedOut;
   final String userId;
 
-  double shw;
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  Future<int> _counter;
+
+  Future<void> _incrementCounter() async {
+    final SharedPreferences prefs = await _prefs;
+    final int counter = (prefs.getInt('counter') ?? 0) + 1;
+
+    setState(() {
+      _counter = prefs.setInt("counter", counter).then((bool success) {
+        return counter;
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _counter = _prefs.then((SharedPreferences prefs) {
+      return (prefs.getInt('counter') ?? 0);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("SharedPreferences Demo"),
+      ),
       body: Center(
-        child: ListView(
-          children: <Widget>[
-            Builder(
-              builder: (context) {
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SlideAction(),
-                );
-              },
-            ),
-            Builder(
-              builder: (context) {
-                final GlobalKey<SlideActionState> _key = GlobalKey();
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SlideAction(
-                    key: _key,
-                    onSubmit: () {
-                      Future.delayed(
-                        Duration(seconds: 1),
-                        () => _key.currentState.reset(),
+          child: FutureBuilder<int>(
+              future: _counter,
+              builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.waiting:
+                    return const CircularProgressIndicator();
+                  default:
+                    if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      return Text(
+                        'Button tapped ${snapshot.data} time${snapshot.data == 1 ? '' : 's'}.\n\n'
+                        'This should persist across restarts.',
                       );
-                    },
-                  ),
-                );
-              },
-            ),
-            Builder(
-              builder: (context) {
-                final GlobalKey<SlideActionState> _key = GlobalKey();
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SlideAction(
-                    key: _key,
-                    onSubmit: () {
-                      Future.delayed(
-                        Duration(seconds: 1),
-                        () => _key.currentState.reset(),
-                      );
-                    },
-                    innerColor: Colors.black,
-                    outerColor: Colors.white,
-                  ),
-                );
-              },
-            ),
-            Builder(
-              builder: (context) {
-                final GlobalKey<SlideActionState> _key = GlobalKey();
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SlideAction(
-                    key: _key,
-                    onSubmit: () {
-                      Future.delayed(
-                        Duration(seconds: 1),
-                        () => _key.currentState.reset(),
-                      );
-                    },
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      'Unlock',
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
-                    sliderButtonIcon: Icon(Icons.lock),
-                  ),
-                );
-              },
-            ),
-            Builder(
-              builder: (context) {
-                final GlobalKey<SlideActionState> _key = GlobalKey();
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SlideAction(
-                    key: _key,
-                    onSubmit: () {
-                      Future.delayed(
-                        Duration(seconds: 1),
-                        () => _key.currentState.reset(),
-                      );
-                    },
-                    height: 100,
-                  ),
-                );
-              },
-            ),
-            Builder(
-              builder: (context) {
-                final GlobalKey<SlideActionState> _key = GlobalKey();
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SlideAction(
-                    key: _key,
-                    onSubmit: () {
-                      Future.delayed(
-                        Duration(seconds: 1),
-                        () => _key.currentState.reset(),
-                      );
-                    },
-                    sliderButtonIconSize: 48,
-                    sliderButtonYOffset: -20,
-                  ),
-                );
-              },
-            ),
-            Builder(
-              builder: (context) {
-                final GlobalKey<SlideActionState> _key = GlobalKey();
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SlideAction(
-                    key: _key,
-                    onSubmit: () {
-                      Future.delayed(
-                        Duration(seconds: 1),
-                        () => _key.currentState.reset(),
-                      );
-                    },
-                    elevation: 24,
-                  ),
-                );
-              },
-            ),
-            Builder(
-              builder: (context) {
-                final GlobalKey<SlideActionState> _key = GlobalKey();
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SlideAction(
-                    key: _key,
-                    onSubmit: () {
-                      Future.delayed(
-                        Duration(seconds: 1),
-                        () => _key.currentState.reset(),
-                      );
-                    },
-                    borderRadius: 16,
-                    animationDuration: Duration(seconds: 1),
-                  ),
-                );
-              },
-            ),
-            Builder(
-              builder: (context) {
-                final GlobalKey<SlideActionState> _key = GlobalKey();
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SlideAction(
-                    key: _key,
-                    onSubmit: () {
-                      Future.delayed(
-                        Duration(seconds: 1),
-                        () => _key.currentState.reset(),
-                      );
-                    },
-                    reversed: true,
-                  ),
-                );
-              },
-            ),
-            Builder(
-              builder: (context) {
-                final GlobalKey<SlideActionState> _key = GlobalKey();
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SlideAction(
-                    key: _key,
-                    onSubmit: () {
-                      Future.delayed(
-                        Duration(seconds: 1),
-                        () => _key.currentState.reset(),
-                      );
-                    },
-                    submittedIcon: Icon(
-                      Icons.done_all,
-                      color: Colors.white,
-                    ),
-                  ),
-                );
-              },
-            ),
-            Builder(
-              builder: (context) {
-                final GlobalKey<SlideActionState> _key = GlobalKey();
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SlideAction(
-                    key: _key,
-                    onSubmit: () {
-                      Future.delayed(
-                        Duration(seconds: 1),
-                        () => _key.currentState.reset(),
-                      );
-                    },
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
+                    }
+                }
+              })),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
       ),
     );
   }

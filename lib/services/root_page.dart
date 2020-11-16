@@ -1,7 +1,7 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:stroinav_app/services/NavBar.dart';
 import 'package:stroinav_app/pages/login_signup_page.dart';
@@ -24,14 +24,37 @@ class _RootPageState extends State<RootPage> {
   Connectivity connectivity;
   StreamSubscription<ConnectivityResult> subscription;
 
-  //AuthStatus authStatus = AuthStatus.NOT_DETERMINED;
-  AuthStatus authStatus = AuthStatus.NOT_LOGGED_IN;
+  AuthStatus authStatus = AuthStatus.NOT_DETERMINED;
+  //AuthStatus authStatus = AuthStatus.NOT_LOGGED_IN;
   String _userId = "";
   String _dogovor = "";
+
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  Future<String> _counter;
+
+  Future<void> _incrementCounter(String status) async {
+    final SharedPreferences prefs = await _prefs;
+    setState(() {
+      _counter = prefs.setString("counter", status).then((bool success) {
+        return status;
+      });
+    });
+  }
+
   double shw = 200;
 
   void initState() {
     super.initState();
+    _counter = _prefs.then((SharedPreferences prefs) {
+      return prefs.getString('counter');
+    });
+    if (_counter == 'LoggedIn') {
+      print('LoggedIn');
+      authStatus = AuthStatus.LOGGED_IN;
+    } else {
+      print('fixme ');
+      authStatus = AuthStatus.NOT_LOGGED_IN;
+    }
     connectivity = new Connectivity();
     subscription =
         connectivity.onConnectivityChanged.listen((ConnectivityResult result) {
@@ -47,6 +70,8 @@ class _RootPageState extends State<RootPage> {
   void _onLoggedIn() {
     setState(() {
       authStatus = AuthStatus.LOGGED_IN;
+      _incrementCounter('LoggedIn');
+      print(_counter);
     });
   }
 
@@ -54,6 +79,7 @@ class _RootPageState extends State<RootPage> {
     setState(() {
       authStatus = AuthStatus.NOT_LOGGED_IN;
       _userId = "";
+      _incrementCounter('LoggedOut');
     });
   }
 
@@ -113,9 +139,9 @@ class _RootPageState extends State<RootPage> {
         break;
       case AuthStatus.LOGGED_IN:
         return new NavBarPage(
-            //userId: _dogovor,
-            //onSignedOut: _onSignedOut,
-            );
+          //userId: _dogovor,
+          onSignedOut: _onSignedOut,
+        );
         break;
       default:
         return _buildWaitingScreen();
