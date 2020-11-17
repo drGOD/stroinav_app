@@ -45,11 +45,12 @@ class PageTwo extends StatefulWidget {
   final VoidCallback onSignedOut;
   final String userId;
 
+
   @override
   State<StatefulWidget> createState() => new _PageTwoState(
-        userId: userId,
-        onSignedOut: onSignedOut,
-      );
+    userId: userId,
+    onSignedOut: onSignedOut,
+  );
 }
 
 class _PageTwoState extends State<PageTwo> {
@@ -91,6 +92,37 @@ class _PageTwoState extends State<PageTwo> {
     super.initState();
   }
 
+  var points = <LatLng>[
+    LatLng(55.858030, 37.687791),
+    LatLng(55.857974, 37.687857),
+    LatLng(55.857686, 37.687268),
+    LatLng(55.857651, 37.687310),
+    LatLng(55.857564, 37.687134),
+    LatLng(55.857489, 37.687223),
+    LatLng(55.857377, 37.686968),
+    LatLng(55.857006, 37.687696),
+    LatLng(55.857075, 37.687870),
+    LatLng(55.856972, 37.688035),
+    LatLng(55.856999, 37.688087),
+    LatLng(55.856477, 37.688879),
+    LatLng(55.856431, 37.689398),
+    LatLng(55.856081, 37.689925),
+    LatLng(55.856124, 37.691205),
+    LatLng(55.856562, 37.692372),
+    LatLng(55.855691, 37.693728),
+    LatLng(55.856378, 37.695226),
+    LatLng(55.857012, 37.694293),
+    LatLng(55.857715, 37.695463),
+    LatLng(55.858183, 37.695016),
+    LatLng(55.858437, 37.695567),
+    LatLng(55.859514, 37.693742),
+    LatLng(55.859430, 37.693563),
+    LatLng(55.859600, 37.693300),
+    LatLng(55.859623, 37.693358),
+    LatLng(55.860237, 37.692153),
+    LatLng(55.858030, 37.687791),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,15 +146,24 @@ class _PageTwoState extends State<PageTwo> {
                 height: 40.0,
                 point: new LatLng(lat, lng),
                 builder: (ctx) =>
-                    Container(child: Icon(Icons.accessible_forward))),
-          ])
+                    Container(child: Icon(Icons.directions_walk))),
+          ]),
+          PolylineLayerOptions(
+              polylines: [
+                Polyline(
+                  points: points,
+                  strokeWidth: 5.0,
+                  color: Color(0xFF255781),
+                )
+              ]
+          )
         ]);
   }
 
   Widget _showCircularProgress() {
     return Center(
         child: CircularProgressIndicator(
-      valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF255781)),
-    ));
+          valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF255781)),
+        ));
   }
 }

@@ -31,7 +31,7 @@ class _PageThreeState extends State<PageThree> {
           body: ListView(
             children: [
               Padding(
-                  padding: EdgeInsets.fromLTRB(10, 35, 10, 5),
+                  padding: EdgeInsets.fromLTRB(10, 45, 10, 5),
                   child: new Column(children: [
                     Container(
                       height: shw / 1.2,
