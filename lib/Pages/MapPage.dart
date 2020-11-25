@@ -191,9 +191,33 @@ class _PageTwoState extends State<PageTwo> {
             ]),
         !_statusLocate
             ? Container(
-                color: Colors.red,
-                height: 200,
-                width: 200,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              stops: [0.1, 0.5, 0.8],
+              colors: [
+                Color(0x40db324d),
+                Color(0x70cf2440),
+                Color(0x60b92139),
+              ],
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.black87, size: 120.0),
+              Text('Предупреждение! Вы покинули стройплощадку будучи на смене!',
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.clip,
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 25.0,
+                      fontWeight: FontWeight.bold
+                  )),
+          ],),
               )
             : Container()
       ],
