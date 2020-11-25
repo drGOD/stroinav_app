@@ -7,25 +7,30 @@ import 'package:stroinav_app/pages/TimePage.dart';
 import 'package:stroinav_app/pages/ProfilePage.dart';
 import 'package:stroinav_app/pages/MapPage.dart';
 import 'package:stroinav_app/pages/ChatPage.dart';
+import 'package:hive/hive.dart';
 
 //Выгрузка на сервер
-Future postGPSData(String uID, String lat, String lng) async {
-  final http.Response response = await http
-      .post('http://185.5.54.22:1337/locations', headers: <String, String>{
+Future postGPSData(String lat, String lng) async {
+  var box = await Hive.openBox('authBox');
+  final http.Response response =
+      await http.post('http://185.5.54.22:1337/locations', headers: <String, String>{
     'Accept': 'application/json',
+    'Authorization': 'Bearer ${box.get('jwt')}',
   }, body: {
-    'uID': '1',
+    'uID': box.get('id').toString(),
     'location.lat': lat,
     'location.lng': lng
   });
 }
 
-Future postGPSDataSOS(String uID, String lat, String lng, String type) async {
+Future postGPSDataSOS(String lat, String lng, String type) async {
+  var box = await Hive.openBox('authBox');
   final http.Response response =
       await http.post('http://185.5.54.22:1337/sos', headers: <String, String>{
     'Accept': 'application/json',
+    'Authorization': 'Bearer ${box.get('jwt')}',
   }, body: {
-    'uID': '1',
+    'uID': box.get('id').toString(),
     'location.lat': lat,
     'location.lng': lng,
     'type': type
@@ -90,7 +95,6 @@ class _NavBarPageState extends State<NavBarPage> {
           ? {
               print('$_position'),
               postGPSDataSOS(
-                  '1',
                   '${_position != null ? _position.latitude.toString() : '0'}',
                   '${_position != null ? _position.longitude.toString() : '0'}',
                   '1')
@@ -98,7 +102,6 @@ class _NavBarPageState extends State<NavBarPage> {
           : {
               print('$_position'),
               postGPSDataSOS(
-                  '1',
                   '${_position != null ? _position.latitude.toString() : '0'}',
                   '${_position != null ? _position.longitude.toString() : '0'}',
                   '3')
@@ -176,7 +179,6 @@ class _NavBarPageState extends State<NavBarPage> {
       setState(() {
         startStatus == StartStatus.Start || startStatusSOS == StartStatus.Start
             ? postGPSData(
-                '2',
                 '${_position != null ? _position.latitude.toString() : '0'}',
                 '${_position != null ? _position.longitude.toString() : '0'}')
             : null;
