@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:stroinav_app/services/NavBar.dart';
 import 'package:stroinav_app/pages/login_signup_page.dart';
@@ -46,6 +48,7 @@ class _RootPageState extends State<RootPage> {
   var s;
 
   Future checkAuth() async {
+    await Hive.initFlutter();
     s = await _prefs.then((prefs) {
       s = prefs.getString('counter');
       return prefs.getString('counter');

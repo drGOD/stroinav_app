@@ -46,12 +46,11 @@ class PageTwo extends StatefulWidget {
   final VoidCallback onSignedOut;
   final String userId;
 
-
   @override
   State<StatefulWidget> createState() => new _PageTwoState(
-    userId: userId,
-    onSignedOut: onSignedOut,
-  );
+        userId: userId,
+        onSignedOut: onSignedOut,
+      );
 }
 
 class _PageTwoState extends State<PageTwo> {
@@ -70,8 +69,17 @@ class _PageTwoState extends State<PageTwo> {
 
   Future/*<List<Marker>>*/ fetchWorkerLocation(http.Client client) async {
     var box = await Hive.openBox('authBox');
+
     print('Jwt: ${box.get('jwt')}');
-    final response = await client.get('http://185.5.54.22:1337/users');
+    print('id: ${box.get('id')}');
+
+    final response = await client
+        .get('http://185.5.54.22:1337/users?id=${box.get('id')}', headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer ${box.get('jwt')}',
+    });
+
     _lat = jsonDecode(response.body)[0]['position']['location']['lat'];
     _lng = jsonDecode(response.body)[0]['position']['location']['lng'];
     _latC = jsonDecode(response.body)[0]['construction']['center']['lat'];
@@ -151,22 +159,20 @@ class _PageTwoState extends State<PageTwo> {
                 builder: (ctx) =>
                     Container(child: Icon(Icons.directions_walk))),
           ]),
-          PolylineLayerOptions(
-              polylines: [
-                Polyline(
-                  points: points,
-                  strokeWidth: 5.0,
-                  color: Color(0xFF255781),
-                )
-              ]
-          )
+          PolylineLayerOptions(polylines: [
+            Polyline(
+              points: points,
+              strokeWidth: 5.0,
+              color: Color(0xFF255781),
+            )
+          ])
         ]);
   }
 
   Widget _showCircularProgress() {
     return Center(
         child: CircularProgressIndicator(
-          valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF255781)),
-        ));
+      valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF255781)),
+    ));
   }
 }
