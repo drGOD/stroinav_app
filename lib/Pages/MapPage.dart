@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:stroinav_app/pages/login_signup_page.dart';
+import 'package:hive/hive.dart';
 
 List<Marker> parseWorkerLocation(String responseBody) {
   final parsed = jsonDecode(responseBody); //.cast<Map<String, dynamic>>();
@@ -68,6 +69,8 @@ class _PageTwoState extends State<PageTwo> {
   ConnectMod _connectMode = ConnectMod.TEST;
 
   Future/*<List<Marker>>*/ fetchWorkerLocation(http.Client client) async {
+    var box = await Hive.openBox('authBox');
+    print('Jwt: ${box.get('jwt')}');
     final response = await client.get('http://185.5.54.22:1337/users');
     _lat = jsonDecode(response.body)[0]['position']['location']['lat'];
     _lng = jsonDecode(response.body)[0]['position']['location']['lng'];

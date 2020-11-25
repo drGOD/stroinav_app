@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class LoginSignUpPage extends StatefulWidget {
   LoginSignUpPage({this.onSignedIn});
@@ -41,6 +43,9 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
     });
     print(jsonDecode(response.body)['jwt']);
     _jwt = jsonDecode(response.body)['jwt'];
+    await Hive.initFlutter();
+    var box = await Hive.openBox('authBox');
+    box.put('jwt', _jwt);
     return _jwt;
   }
 
