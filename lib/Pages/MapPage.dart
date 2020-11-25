@@ -60,11 +60,13 @@ class _PageTwoState extends State<PageTwo> {
   final String userId;
   final Set<Polygon> _polygons = {};
 
-  double _lat;
-  double _lng;
+  var _lat;
+  var _lng;
 
-  double _latC;
-  double _lngC;
+  var _latC;
+  var _lngC;
+
+  var _statusLocate = true;
 
   var _polygonPoints;
 
@@ -72,10 +74,6 @@ class _PageTwoState extends State<PageTwo> {
 
   Future/*<List<Marker>>*/ fetchWorkerLocation(http.Client client) async {
     var box = await Hive.openBox('authBox');
-
-    print('Jwt: ${box.get('jwt')}');
-    print('id: ${box.get('id')}');
-
     final response = await client
         .get('http://185.5.54.22:1337/users?id=${box.get('id')}', headers: {
       'Content-Type': 'application/json',
@@ -98,7 +96,17 @@ class _PageTwoState extends State<PageTwo> {
   void initState() {
     fetchWorkerLocation(http.Client());
     Timer.periodic(Duration(seconds: 10), (Timer t) {
-      print(_checkIfValidMarker(LatLng(55.858367036993684, 37.68967943425713) ,_polygonPoints));
+      if (_checkIfValidMarker(LatLng(_lat, _lng), _polygonPoints)) {
+        setState(() {
+          _statusLocate = true;
+          print('true');
+        });
+      } else {
+        setState(() {
+          _statusLocate = false;
+          print('false');
+        });
+      }
       setState(() {
         fetchWorkerLocation(http.Client());
       });
@@ -155,30 +163,41 @@ class _PageTwoState extends State<PageTwo> {
   }
 
   Widget _map(double lat, double lng) {
-    return FlutterMap(
-        options: new MapOptions(
-          center: new LatLng(_latC, _lngC),
-          zoom: 15.0,
-        ),
-        layers: [
-          new TileLayerOptions(
-              urlTemplate: "http://tiles.maps.sputnik.ru/{z}/{x}/{y}.png"),
-          new MarkerLayerOptions(markers: [
-            new Marker(
-                width: 40.0,
-                height: 40.0,
-                point: new LatLng(lat, lng),
-                builder: (ctx) =>
-                    Container(child: Icon(Icons.directions_walk))),
-          ]),
-          PolylineLayerOptions(polylines: [
-            Polyline(
-              points: _polygonPoints,
-              strokeWidth: 5.0,
-              color: Color(0xFF255781),
-            )
-          ])
-        ]);
+    return Stack(
+      children: [
+        FlutterMap(
+            options: new MapOptions(
+              center: new LatLng(_latC, _lngC),
+              zoom: 15.0,
+            ),
+            layers: [
+              new TileLayerOptions(
+                  urlTemplate: "http://tiles.maps.sputnik.ru/{z}/{x}/{y}.png"),
+              new MarkerLayerOptions(markers: [
+                new Marker(
+                    width: 40.0,
+                    height: 40.0,
+                    point: new LatLng(lat, lng),
+                    builder: (ctx) =>
+                        Container(child: Icon(Icons.directions_walk))),
+              ]),
+              PolylineLayerOptions(polylines: [
+                Polyline(
+                  points: _polygonPoints,
+                  strokeWidth: 5.0,
+                  color: Color(0xFF255781),
+                )
+              ])
+            ]),
+        !_statusLocate
+            ? Container(
+                color: Colors.red,
+                height: 200,
+                width: 200,
+              )
+            : Container()
+      ],
+    );
   }
 
   Widget _showCircularProgress() {
