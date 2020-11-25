@@ -65,6 +65,8 @@ class _PageTwoState extends State<PageTwo> {
   double _latC;
   double _lngC;
 
+  var _polygonPoints;
+
   ConnectMod _connectMode = ConnectMod.TEST;
 
   Future/*<List<Marker>>*/ fetchWorkerLocation(http.Client client) async {
@@ -84,7 +86,7 @@ class _PageTwoState extends State<PageTwo> {
     _lng = jsonDecode(response.body)[0]['position']['location']['lng'];
     _latC = jsonDecode(response.body)[0]['construction']['center']['lat'];
     _lngC = jsonDecode(response.body)[0]['construction']['center']['lng'];
-    print('lat ${jsonDecode(response.body)[0]['position']['location']['lat']}');
+    _getListOfLatLong(jsonDecode(response.body)[0]['construction']['polygon']);
     setState(() {
       _connectMode = ConnectMod.OK;
     });
@@ -103,36 +105,16 @@ class _PageTwoState extends State<PageTwo> {
     super.initState();
   }
 
-  var points = <LatLng>[
-    LatLng(55.858030, 37.687791),
-    LatLng(55.857974, 37.687857),
-    LatLng(55.857686, 37.687268),
-    LatLng(55.857651, 37.687310),
-    LatLng(55.857564, 37.687134),
-    LatLng(55.857489, 37.687223),
-    LatLng(55.857377, 37.686968),
-    LatLng(55.857006, 37.687696),
-    LatLng(55.857075, 37.687870),
-    LatLng(55.856972, 37.688035),
-    LatLng(55.856999, 37.688087),
-    LatLng(55.856477, 37.688879),
-    LatLng(55.856431, 37.689398),
-    LatLng(55.856081, 37.689925),
-    LatLng(55.856124, 37.691205),
-    LatLng(55.856562, 37.692372),
-    LatLng(55.855691, 37.693728),
-    LatLng(55.856378, 37.695226),
-    LatLng(55.857012, 37.694293),
-    LatLng(55.857715, 37.695463),
-    LatLng(55.858183, 37.695016),
-    LatLng(55.858437, 37.695567),
-    LatLng(55.859514, 37.693742),
-    LatLng(55.859430, 37.693563),
-    LatLng(55.859600, 37.693300),
-    LatLng(55.859623, 37.693358),
-    LatLng(55.860237, 37.692153),
-    LatLng(55.858030, 37.687791),
-  ];
+  List<LatLng> _getListOfLatLong(polygonData) {
+    List<LatLng> list = [];
+    polygonData.forEach((element) {
+      var point = element as Map<String, dynamic>;
+      list.add(LatLng(point['lat'], point['lng']));
+    });
+    list.add(list[0]); // Костыль для того чтобы полигон был законченным
+    _polygonPoints = list;
+    return list;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -161,7 +143,7 @@ class _PageTwoState extends State<PageTwo> {
           ]),
           PolylineLayerOptions(polylines: [
             Polyline(
-              points: points,
+              points: _polygonPoints,
               strokeWidth: 5.0,
               color: Color(0xFF255781),
             )
