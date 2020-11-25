@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import 'package:stroinav_app/pages/TimePage.dart';
 import 'package:stroinav_app/pages/ProfilePage.dart';
@@ -37,9 +38,9 @@ Future postGPSDataSOS(String lat, String lng, String type) async {
   });
 }
 
-Future postStatus(bool work, bool sos) async {
+Future postStatus(String work, String sos) async {
   var box = await Hive.openBox('authBox');
-  final http.Response response = await http.post(
+  final http.Response response = await http.put(
       'http://185.5.54.22:1337/users/${box.get('id').toString()}',
       headers: <String, String>{
         'Accept': 'application/json',
@@ -116,12 +117,14 @@ class _NavBarPageState extends State<NavBarPage> {
           ? {
               startStatus = StartStatus.Stop,
               _startStatus = "Stop",
-              box.put('startStatus', "Stop")
+              box.put('startStatus', "Stop"),
+              postStatus("false", "false")
             }
           : {
               startStatus = StartStatus.Start,
               _startStatus = "Start",
-              box.put('startStatus', "Start")
+              box.put('startStatus', "Start"),
+              postStatus('true', "false")
             };
       print('$_startStatus work');
       initStatePage();
@@ -140,7 +143,9 @@ class _NavBarPageState extends State<NavBarPage> {
               postGPSDataSOS(
                   '${_position != null ? _position.latitude.toString() : '0'}',
                   '${_position != null ? _position.longitude.toString() : '0'}',
-                  '1')
+                  '1'),
+              postStatus(
+                  box.get('startStatus') == 'Start' ? 'true' : "false", "false")
             }
           : {
               startStatusSOS = StartStatus.Start,
@@ -150,7 +155,9 @@ class _NavBarPageState extends State<NavBarPage> {
               postGPSDataSOS(
                   '${_position != null ? _position.latitude.toString() : '0'}',
                   '${_position != null ? _position.longitude.toString() : '0'}',
-                  '3')
+                  '3'),
+              postStatus(
+                  box.get('startStatus') == 'Start' ? 'true' : "false", 'true')
             };
       print('$_startStatusSOS sos');
       initStatePage();
