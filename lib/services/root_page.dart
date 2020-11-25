@@ -46,8 +46,6 @@ class _RootPageState extends State<RootPage> {
     }
   }
 
-  someMethod2() async {}
-
   void initState() {
     super.initState();
 
@@ -68,7 +66,9 @@ class _RootPageState extends State<RootPage> {
   void _onLoggedIn() {
     setState(() {
       // var box = await Hive.openBox('authBox');
-      box.put('v', 'LoggedIn');
+      box.put('LoggedStatus', 'LoggedIn');
+      box.put('startStatusSOS', "Stop");
+      box.put('startStatus', "Stop");
       authStatus = AuthStatus.LOGGED_IN;
     });
   }

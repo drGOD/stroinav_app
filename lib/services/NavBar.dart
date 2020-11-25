@@ -12,8 +12,8 @@ import 'package:hive/hive.dart';
 //Выгрузка на сервер
 Future postGPSData(String lat, String lng) async {
   var box = await Hive.openBox('authBox');
-  final http.Response response =
-      await http.post('http://185.5.54.22:1337/locations', headers: <String, String>{
+  final http.Response response = await http
+      .post('http://185.5.54.22:1337/locations', headers: <String, String>{
     'Accept': 'application/json',
     'Authorization': 'Bearer ${box.get('jwt')}',
   }, body: {
@@ -35,6 +35,20 @@ Future postGPSDataSOS(String lat, String lng, String type) async {
     'location.lng': lng,
     'type': type
   });
+}
+
+Future postStatus(bool work, bool sos) async {
+  var box = await Hive.openBox('authBox');
+  final http.Response response = await http.post(
+      'http://185.5.54.22:1337/users/${box.get('id').toString()}',
+      headers: <String, String>{
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ${box.get('jwt')}',
+      },
+      body: {
+        'working': work,
+        'accident': sos
+      });
 }
 
 class NavBarPage extends StatefulWidget {
@@ -64,15 +78,51 @@ class _NavBarPageState extends State<NavBarPage> {
   StartStatus startStatus = StartStatus.Stop;
   StartStatus startStatusSOS = StartStatus.Stop;
 
-  String _startStatus = 'Stop';
-  String _startStatusSOS = 'Stop';
+  String _startStatus;
+  String _startStatusSOS;
+  bool _isLoading = true;
+
+  var box;
+
+  initStatus() async {
+    box = await Hive.openBox('authBox');
+    setState(() {
+      _startStatus = box.get('startStatus');
+      if (_startStatus == 'Start') {
+        startStatus = StartStatus.Start;
+        print('startStatus == Start');
+      } else {
+        startStatus = StartStatus.Stop;
+        print('startStatus == Stop');
+      }
+      _startStatusSOS = box.get('startStatusSOS');
+      if (_startStatusSOS == 'Start') {
+        startStatusSOS = StartStatus.Start;
+        print('sos Status == Start');
+      } else {
+        startStatusSOS = StartStatus.Stop;
+        print('sos Status == Stop');
+      }
+    });
+    initStatePage();
+    _isLoading = false;
+    print('тест');
+  }
 
   //смена статуса смены
   void onWorkStatus() {
     setState(() {
       startStatus == StartStatus.Start
-          ? {startStatus = StartStatus.Stop, _startStatus = "Stop"}
-          : {startStatus = StartStatus.Start, _startStatus = "Start"};
+          ? {
+              startStatus = StartStatus.Stop,
+              _startStatus = "Stop",
+              box.put('startStatus', "Stop")
+            }
+          : {
+              startStatus = StartStatus.Start,
+              _startStatus = "Start",
+              box.put('startStatus', "Start")
+            };
       print('$_startStatus work');
       initStatePage();
       return currentPage = pages[2];
@@ -85,14 +135,7 @@ class _NavBarPageState extends State<NavBarPage> {
           ? {
               startStatusSOS = StartStatus.Stop,
               _startStatusSOS = "Stop",
-            }
-          : {
-              startStatusSOS = StartStatus.Start,
-              _startStatusSOS = "Start",
-            };
-      print('$_startStatusSOS sos');
-      startStatusSOS == StartStatus.Start
-          ? {
+              box.put('startStatusSOS', "Stop"),
               print('$_position'),
               postGPSDataSOS(
                   '${_position != null ? _position.latitude.toString() : '0'}',
@@ -100,12 +143,16 @@ class _NavBarPageState extends State<NavBarPage> {
                   '1')
             }
           : {
+              startStatusSOS = StartStatus.Start,
+              _startStatusSOS = "Start",
+              box.put('startStatusSOS', "Start"),
               print('$_position'),
               postGPSDataSOS(
                   '${_position != null ? _position.latitude.toString() : '0'}',
                   '${_position != null ? _position.longitude.toString() : '0'}',
                   '3')
             };
+      print('$_startStatusSOS sos');
       initStatePage();
       return currentPage = pages[2];
     });
@@ -163,14 +210,15 @@ class _NavBarPageState extends State<NavBarPage> {
       startStatusSOS: _startStatusSOS,
     );
     four = PageThree();
-
+    currentPage = three;
     pages = [one, two, three, four];
   }
 
   @override
   void initState() {
-    initStatePage();
-    currentPage = three;
+    initStatus();
+    //initStatePage();
+    //initStatus();
     super.initState();
 
     //геолокация
@@ -186,20 +234,26 @@ class _NavBarPageState extends State<NavBarPage> {
     });
   }
 
+//отображение
   @override
   Widget build(BuildContext context) {
     shw = MediaQuery.of(context).size.width;
-    return Scaffold(
-      body: _pageContext(),
-      bottomNavigationBar: _bottomBar(),
-    );
+    if (_isLoading == true) {
+      return _showCircularProgress();
+    } else {
+      return Scaffold(
+        body: _pageContext(),
+        bottomNavigationBar: _bottomBar(),
+      );
+    }
   }
 
   //Страница+бар
   Widget _pageContext() {
     return new PageStorage(
       child: currentPage == three //fixme убрать одну страницу
-          ? currentPage //иссключение верхнего меню
+          ? currentPage
+          //иссключение верхнего меню
           : Stack(children: [currentPage, _topBar()]),
       bucket: bucket,
     );
@@ -287,5 +341,12 @@ class _NavBarPageState extends State<NavBarPage> {
                         color: Colors.black54)))),
       ],
     );
+  }
+
+  Widget _showCircularProgress() {
+    return Center(
+        child: CircularProgressIndicator(
+      valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF255781)),
+    ));
   }
 }
