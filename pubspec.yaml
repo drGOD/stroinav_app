@@ -38,7 +38,6 @@ dependencies:
   latlong: ^0.6.1
   sliding_button: ^0.0.2
   slide_to_act: any
-  shared_preferences: any
   hive: ^1.4.4+1
   hive_flutter: ^0.3.1
 

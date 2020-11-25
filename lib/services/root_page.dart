@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -28,31 +27,14 @@ class _RootPageState extends State<RootPage> {
 
   AuthStatus authStatus = AuthStatus.NOT_DETERMINED;
   //AuthStatus authStatus = AuthStatus.LOGGED_IN;
-  String _userId = "";
-  String _dogovor = "";
-
-  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-  Future<String> _counter;
-  SharedPreferences prefs;
-
-  Future<void> _incrementCounter(String status) async {
-    final SharedPreferences prefs = await _prefs;
-    setState(() {
-      _counter = prefs.setString("counter", status).then((bool success) {
-        return status;
-      });
-    });
-  }
 
   double shw = 200;
-  var s;
+  var box;
 
   Future checkAuth() async {
     await Hive.initFlutter();
-    s = await _prefs.then((prefs) {
-      s = prefs.getString('counter');
-      return prefs.getString('counter');
-    });
+    box = await Hive.openBox('authBox');
+    var s = box.get('LoggedStatus');
     if (s == 'LoggedIn') {
       setState(() {
         authStatus = AuthStatus.LOGGED_IN;
@@ -85,17 +67,17 @@ class _RootPageState extends State<RootPage> {
 
   void _onLoggedIn() {
     setState(() {
+      // var box = await Hive.openBox('authBox');
+      box.put('v', 'LoggedIn');
       authStatus = AuthStatus.LOGGED_IN;
-      _incrementCounter('LoggedIn');
-      print(_counter);
     });
   }
 
   void _onSignedOut() {
     setState(() {
+      // var box = await Hive.openBox('authBox');
+      box.put('LoggedStatus', 'LoggedOut');
       authStatus = AuthStatus.NOT_LOGGED_IN;
-      _userId = "";
-      _incrementCounter('LoggedOut');
     });
   }
 
