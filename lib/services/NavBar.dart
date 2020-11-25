@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 import 'package:stroinav_app/pages/TimePage.dart';
 import 'package:stroinav_app/pages/ProfilePage.dart';
@@ -34,7 +33,8 @@ Future postGPSDataSOS(String lat, String lng, String type) async {
     'uID': box.get('id').toString(),
     'location.lat': lat,
     'location.lng': lng,
-    'type': type
+    'type': type,
+    'constructionId': box.get('constructionId')
   });
 }
 

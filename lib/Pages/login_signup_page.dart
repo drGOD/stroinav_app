@@ -43,9 +43,12 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
     print(jsonDecode(response.body)['jwt']);
     _jwt = jsonDecode(response.body)['jwt'];
     var id = jsonDecode(response.body)['user']['id'];
+    var constructionId =
+        jsonDecode(response.body)['user']['construction']['id'];
     var box = await Hive.openBox('authBox');
     box.put('jwt', _jwt);
     box.put('id', id);
+    box.put('constructionId', constructionId);
     return _jwt;
   }
 
