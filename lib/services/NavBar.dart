@@ -34,7 +34,7 @@ Future postGPSDataSOS(String lat, String lng, String type) async {
     'location.lat': lat,
     'location.lng': lng,
     'type': type,
-    'constructionId': box.get('constructionId')
+    'constructionId': box.get('constructionId').toString()
   });
 }
 
