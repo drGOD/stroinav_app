@@ -5,22 +5,7 @@ import 'package:latlong/latlong.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:stroinav_app/pages/login_signup_page.dart';
 import 'package:hive/hive.dart';
-
-List<Marker> parseWorkerLocation(String responseBody) {
-  final parsed = jsonDecode(responseBody); //.cast<Map<String, dynamic>>();
-  /* return parsed
-      .map<WorkerLocation>((json) => WorkerLocation.fromJson(json))
-      .toList();*/
-  /*return parsed.map<WorkerLocation>((json) {
-    return Marker(
-        width: 40.0,
-        height: 40.0,
-        point: new LatLng(55.785811, 37.4491582),
-        builder: (ctx) => Container(child: Icon(Icons.accessible_forward)));
-  });*/
-}
 
 class WorkerLocation {
   final String username;
@@ -58,7 +43,6 @@ class _PageTwoState extends State<PageTwo> {
 
   final VoidCallback onSignedOut;
   final String userId;
-  final Set<Polygon> _polygons = {};
 
   var _lat;
   var _lng;
@@ -72,9 +56,9 @@ class _PageTwoState extends State<PageTwo> {
 
   ConnectMod _connectMode = ConnectMod.TEST;
 
-  Future/*<List<Marker>>*/ fetchWorkerLocation(http.Client client) async {
+  Future/*<List<Marker>>*/ fetchWorkerLocation() async {
     var box = await Hive.openBox('authBox');
-    final response = await client
+    final response = await http
         .get('https://apistroinav.dic.li/users?id=${box.get('id')}', headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
@@ -94,7 +78,7 @@ class _PageTwoState extends State<PageTwo> {
   }
 
   void initState() {
-    fetchWorkerLocation(http.Client());
+    fetchWorkerLocation();
     Timer.periodic(Duration(seconds: 10), (Timer t) {
       if (_checkIfValidMarker(LatLng(_lat, _lng), _polygonPoints)) {
         setState(() {
@@ -108,7 +92,7 @@ class _PageTwoState extends State<PageTwo> {
         });
       }
       setState(() {
-        fetchWorkerLocation(http.Client());
+        fetchWorkerLocation();
       });
     });
     //print(fetchWorkerLocation(http.Client()));
