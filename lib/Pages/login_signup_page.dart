@@ -76,6 +76,31 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
     return _jwt;
   }
 
+  Future postSingUP(
+      String _fio,
+      String _email,
+      String _phone,
+      String _password,
+      String _employerName,
+      String _occupation,
+      String selectedConstructions) async {
+    final http.Response response = await http
+        .post('https://apistroinav.dic.li/users/', headers: <String, String>{
+      'Accept': 'application/json',
+    }, body: {
+      'fio': _fio,
+      'username': _fio,
+      'phone': _phone,
+      'employerName': _employerName,
+      'occupation': _occupation,
+      'construction': selectedConstructions,
+      'email': _email,
+      'password': _password,
+      'confirmed': 'true',
+    });
+    return jsonDecode(response.body)['id'];
+  }
+
   _launchURL() async {
     var url = 'https://kaluga.iniciativa.app/docs/tos';
     if (await canLaunch(url)) {
@@ -100,37 +125,41 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
       _isLoading = true;
     });
     if (_validateAndSave()) {
-      String userId = "";
       try {
-        await postLogin(_email, _password);
-        if (_jwt.length > 0 && _jwt != null) {
-          print('login');
-          widget.onSignedIn();
-        }
-        /*if (_formMode == FormMode.LOGIN) {
-          userId = await widget.auth.signIn(_email, _password);
-          print('Signed in: $userId');
+        if (_formMode == FormMode.SIGNUP) {
+          if (await postSingUP(_fio, _email, _phone, _password, _employerName,
+                  _occupation, selectedConstructions) !=
+              null) {
+            await postLogin(_email, _password);
+            if (_jwt.length > 0 && _jwt != null) {
+              print('login');
+              widget.onSignedIn();
+            }
+            setState(() {
+              _isLoading = false;
+            });
+          } else {
+            setState(() {
+              _isLoading = false;
+              _errorMessage = 'Не корректные данные';
+            });
+          }
         } else {
-          _dataOfStudent =
-              'dogovor=$_dogovor&filial=$selectedFilial&group=$selectedGroup';
-          userId = await widget.auth.signUp(_email, _dataOfStudent, _password);
-          print('Signed in: $userId');
-        }*/
-        setState(() {
-          _isLoading = false;
-        });
-
-        if (userId.length > 0 && userId != null) {
-          widget.onSignedIn();
+          await postLogin(_email, _password);
+          if (_jwt.length > 0 && _jwt != null) {
+            print('login');
+            widget.onSignedIn();
+          }
+          setState(() {
+            _isLoading = false;
+          });
         }
       } catch (e) {
         print('Error: $e');
         setState(() {
           _isLoading = false;
-          if (_isIos) {
-            _errorMessage = e.message;
-          } else
-            _errorMessage = e.message;
+
+          _errorMessage = e.message;
         });
       }
     } else {
@@ -389,7 +418,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                     height: 1,
                     color: Colors.grey,
                   ),
-                  hint: new Text("Выберите филиал",
+                  hint: new Text("Выберите объект",
                       overflow: TextOverflow.fade,
                       style: TextStyle(
                         color: Colors.grey,
@@ -510,9 +539,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                               fontSize: 20.0, color: Colors.white)),
               onPressed: _loginMode == FormMode.EMPTY
                   ? _changeloginMode
-                  : _formMode == FormMode.LOGIN
-                      ? _validateAndSubmit
-                      : null),
+                  : _validateAndSubmit),
         ));
   }
 
