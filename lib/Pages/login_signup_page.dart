@@ -15,7 +15,7 @@ class LoginSignUpPage extends StatefulWidget {
   State<StatefulWidget> createState() => new _LoginSignUpPageState();
 }
 
-enum FormMode { LOGIN, SIGNUP, EMPTY }
+enum FormMode { LOGIN, SIGNUP }
 
 class _LoginSignUpPageState extends State<LoginSignUpPage> {
   final _formKey = new GlobalKey<FormState>();
@@ -33,9 +33,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
   String selectedConstructions;
 
   FormMode _formMode = FormMode.LOGIN;
-  FormMode _loginMode = FormMode.EMPTY;
   var _jwt;
-  bool _isIos;
   bool _isLoading;
 
   double shw;
@@ -99,6 +97,19 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
       'confirmed': 'true',
     });
     return jsonDecode(response.body)['id'];
+  }
+
+  Future checkINN() async {
+    final response = await http.post(
+        'https://suggestions.dadata.ru/suggestions/api/4_1/rs/findById/party',
+        headers: {
+          'Authorization': 'Token d06e1d7a7afce7f3c5d806b936fc7c77f8a2f245',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Cookie': '__ddg1=i268GlwdoGcT5C4BlmyV'
+        },
+        body: jsonEncode({"query": "7707083893"}));
+    print(jsonDecode(response.body)['suggestions'][0]['value']);
   }
 
   _launchURL() async {
@@ -189,7 +200,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
   void _changeloginMode() {
     _errorMessage = "";
     setState(() {
-      _loginMode = FormMode.SIGNUP;
+      _formMode = FormMode.SIGNUP;
     });
   }
 
@@ -204,7 +215,6 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
   @override
   Widget build(BuildContext context) {
     shw = MediaQuery.of(context).size.width;
-    _isIos = Theme.of(context).platform == TargetPlatform.iOS;
     return new Scaffold(
         backgroundColor: Colors.white,
         body: Stack(
@@ -241,28 +251,21 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
         child: new Form(
           key: _formKey,
           child: Center(
-            child: _loginMode == FormMode.EMPTY
-                ? new Column(
-                    children: <Widget>[
-                      _showPrimaryButton(),
-                      //_showSupportButton(),
-                    ],
-                  )
-                : new Column(
-                    children: <Widget>[
-                      _showFIOInput(),
-                      _showEmailInput(),
-                      _showPhoneInput(),
-                      _showPasswordInput(),
-                      _showDropDownButtonFilial(),
-                      _showEmployerNameInput(),
-                      _showOccupationInput(),
-                      _showRulesButton(),
-                      _showPrimaryButton(),
-                      _showSecondaryButton(),
-                      _showErrorMessage(),
-                    ],
-                  ),
+            child: new Column(
+              children: <Widget>[
+                _showFIOInput(),
+                _showEmailInput(),
+                _showPhoneInput(),
+                _showPasswordInput(),
+                _showDropDownButtonFilial(),
+                _showEmployerNameInput(),
+                _showOccupationInput(),
+                _showRulesButton(),
+                _showPrimaryButton(),
+                _showSecondaryButton(),
+                _showErrorMessage(),
+              ],
+            ),
           ),
         ));
   }
@@ -527,19 +530,13 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                   borderRadius: new BorderRadius.circular(30.0)),
               color: Color(0xFF255781),
               disabledColor: Color(0xFF1b3e5c),
-              child: _loginMode == FormMode.EMPTY
-                  ? new Text('Войти в личный кабинет',
+              child: _formMode == FormMode.LOGIN
+                  ? new Text('Войти',
                       style: new TextStyle(fontSize: 20.0, color: Colors.white))
-                  : _formMode == FormMode.LOGIN
-                      ? new Text('Войти',
-                          style: new TextStyle(
-                              fontSize: 20.0, color: Colors.white))
-                      : new Text('Создать аккаунт',
-                          style: new TextStyle(
-                              fontSize: 20.0, color: Colors.white)),
-              onPressed: _loginMode == FormMode.EMPTY
-                  ? _changeloginMode
-                  : _validateAndSubmit),
+                  : new Text('Создать аккаунт',
+                      style:
+                          new TextStyle(fontSize: 20.0, color: Colors.white)),
+              onPressed: _validateAndSubmit),
         ));
   }
 
