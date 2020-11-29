@@ -75,7 +75,7 @@ class _PageTwoState extends State<PageTwo> {
   Future/*<List<Marker>>*/ fetchWorkerLocation(http.Client client) async {
     var box = await Hive.openBox('authBox');
     final response = await client
-        .get('http://185.5.54.22:1337/users?id=${box.get('id')}', headers: {
+        .get('https://apistroinav.dic.li/users?id=${box.get('id')}', headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
       'Authorization': 'Bearer ${box.get('jwt')}',
@@ -191,33 +191,34 @@ class _PageTwoState extends State<PageTwo> {
             ]),
         !_statusLocate
             ? Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              stops: [0.1, 0.5, 0.8],
-              colors: [
-                Color(0x40db324d),
-                Color(0x70cf2440),
-                Color(0x60b92139),
-              ],
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(Icons.error, color: Colors.black87, size: 120.0),
-              Text('Предупреждение! Вы покинули стройплощадку будучи на смене!',
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.clip,
-                  style: TextStyle(
-                    color: Colors.black87,
-                    fontSize: 25.0,
-                      fontWeight: FontWeight.bold
-                  )),
-          ],),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    stops: [0.1, 0.5, 0.8],
+                    colors: [
+                      Color(0x40db324d),
+                      Color(0x70cf2440),
+                      Color(0x60b92139),
+                    ],
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error, color: Colors.black87, size: 120.0),
+                    Text(
+                        'Предупреждение! Вы покинули стройплощадку будучи на смене!',
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.clip,
+                        style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 25.0,
+                            fontWeight: FontWeight.bold)),
+                  ],
+                ),
               )
             : Container()
       ],

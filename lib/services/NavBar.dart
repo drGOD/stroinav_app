@@ -13,7 +13,7 @@ import 'package:hive/hive.dart';
 Future postGPSData(String lat, String lng) async {
   var box = await Hive.openBox('authBox');
   final http.Response response = await http
-      .post('http://185.5.54.22:1337/locations', headers: <String, String>{
+      .post('https://apistroinav.dic.li/locations', headers: <String, String>{
     'Accept': 'application/json',
     'Authorization': 'Bearer ${box.get('jwt')}',
   }, body: {
@@ -25,8 +25,8 @@ Future postGPSData(String lat, String lng) async {
 
 Future postGPSDataSOS(String lat, String lng, String type) async {
   var box = await Hive.openBox('authBox');
-  final http.Response response =
-      await http.post('http://185.5.54.22:1337/sos', headers: <String, String>{
+  final http.Response response = await http
+      .post('https://apistroinav.dic.li/sos', headers: <String, String>{
     'Accept': 'application/json',
     'Authorization': 'Bearer ${box.get('jwt')}',
   }, body: {
@@ -41,7 +41,7 @@ Future postGPSDataSOS(String lat, String lng, String type) async {
 Future postStatus(String work, String sos) async {
   var box = await Hive.openBox('authBox');
   final http.Response response = await http.put(
-      'http://185.5.54.22:1337/users/${box.get('id').toString()}',
+      'https://apistroinav.dic.li/users/${box.get('id').toString()}',
       headers: <String, String>{
         'Accept': 'application/json',
         'Authorization': 'Bearer ${box.get('jwt')}',
@@ -107,7 +107,6 @@ class _NavBarPageState extends State<NavBarPage> {
     });
     initStatePage();
     _isLoading = false;
-    print('тест');
   }
 
   //смена статуса смены

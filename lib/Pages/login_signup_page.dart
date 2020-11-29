@@ -20,9 +20,17 @@ enum FormMode { LOGIN, SIGNUP, EMPTY }
 class _LoginSignUpPageState extends State<LoginSignUpPage> {
   final _formKey = new GlobalKey<FormState>();
 
+  String _fio;
   String _email;
+  String _phone;
   String _password;
+  String _employerName;
+  String _occupation;
   String _errorMessage;
+
+  List dataConstructions;
+  List<Constructions> _constructions;
+  String selectedConstructions;
 
   FormMode _formMode = FormMode.LOGIN;
   FormMode _loginMode = FormMode.EMPTY;
@@ -32,14 +40,30 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
 
   double shw;
 
-  Future postLogin(String _email, String _password) async {
-    final http.Response response = await http
-        .post('http://185.5.54.22:1337/auth/local/', headers: <String, String>{
-      'Accept': 'application/json',
-    }, body: {
-      'identifier': _email,
-      'password': _password,
+  Future<List<Constructions>> getFilials() async {
+    final http.Response response = await http.get(
+        Uri.parse("https://apistroinav.dic.li/constructions"),
+        headers: {"Accept": "application/json"});
+    setState(() {
+      dataConstructions = json.decode(utf8.decode(response.bodyBytes));
+      _constructions = [];
+      _constructions = (dataConstructions)
+          .map<Constructions>((item) => Constructions.fromJson(item))
+          .toList();
     });
+    return _constructions;
+  }
+
+  Future postLogin(String _email, String _password) async {
+    final http.Response response = await http.post(
+        'https://apistroinav.dic.li/auth/local/',
+        headers: <String, String>{
+          'Accept': 'application/json',
+        },
+        body: {
+          'identifier': _email,
+          'password': _password,
+        });
     print(jsonDecode(response.body)['jwt']);
     _jwt = jsonDecode(response.body)['jwt'];
     var id = jsonDecode(response.body)['user']['id'];
@@ -118,12 +142,14 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
 
   @override
   void initState() {
+    this.getFilials();
     _errorMessage = "";
     _isLoading = false;
     super.initState();
   }
 
   void _changeFormToSignUp() {
+    this.getFilials();
     _formKey.currentState.reset();
     _errorMessage = "";
     setState(() {
@@ -195,8 +221,13 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                   )
                 : new Column(
                     children: <Widget>[
+                      _showFIOInput(),
                       _showEmailInput(),
+                      _showPhoneInput(),
                       _showPasswordInput(),
+                      _showDropDownButtonFilial(),
+                      _showEmployerNameInput(),
+                      _showOccupationInput(),
                       _showRulesButton(),
                       _showPrimaryButton(),
                       _showSecondaryButton(),
@@ -210,7 +241,6 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
   Widget _showLogoBody() {
     return new Container(
       width: 10000.0,
-      //color: Color(0xFF304FFE),
       child: _showLogo(),
     );
   }
@@ -233,19 +263,51 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
   }
 
   Widget _showLogo() {
-    return new Hero(
-      tag: 'hero',
-      child: Padding(
-        padding: _formMode == FormMode.LOGIN
-            ? EdgeInsets.fromLTRB(0.0, 70.0, 0.0, 70.0)
-            : EdgeInsets.fromLTRB(0.0, 30.0, 0.0, 20.0),
-        child: CircleAvatar(
-          backgroundColor: Color(0x000000000),
-          radius: 100.0,
-          child: Image.asset('image/Logo_100.png', fit: BoxFit.cover),
+    if (_formMode != FormMode.SIGNUP) {
+      return new Hero(
+        tag: 'hero',
+        child: Padding(
+          padding: _formMode == FormMode.LOGIN
+              ? EdgeInsets.fromLTRB(0.0, 70.0, 0.0, 70.0)
+              : EdgeInsets.fromLTRB(0.0, 30.0, 0.0, 20.0),
+          child: CircleAvatar(
+            backgroundColor: Color(0x000000000),
+            radius: 100.0,
+            child: Image.asset('image/Logo_100.png', fit: BoxFit.cover),
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      return new Container(
+        height: 50,
+      );
+    }
+  }
+
+  Widget _showFIOInput() {
+    if (_formMode == FormMode.SIGNUP) {
+      return Padding(
+        padding: _formMode == FormMode.LOGIN
+            ? const EdgeInsets.fromLTRB(0.0, 45.0, 0.0, 0.0)
+            : const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+        child: new TextFormField(
+          maxLines: 1,
+          keyboardType: TextInputType.text,
+          autofocus: false,
+          decoration: new InputDecoration(
+              hintText: 'ФИО',
+              icon: new Icon(
+                Icons.person,
+                color: Colors.grey,
+              )),
+          validator: (value) =>
+              value.isEmpty ? 'ФИО не может быть пустым' : null,
+          onSaved: (value) => _fio = value,
+        ),
+      );
+    } else {
+      return new Container();
+    }
   }
 
   Widget _showEmailInput() {
@@ -270,6 +332,30 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
     );
   }
 
+  Widget _showPhoneInput() {
+    if (_formMode == FormMode.SIGNUP) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+        child: new TextFormField(
+          maxLines: 1,
+          keyboardType: TextInputType.phone,
+          autofocus: false,
+          decoration: new InputDecoration(
+              hintText: 'Телефон',
+              icon: new Icon(
+                Icons.phone,
+                color: Colors.grey,
+              )),
+          validator: (value) =>
+              value.isEmpty ? 'Телефон не может быть пустым' : null,
+          onSaved: (value) => _phone = value,
+        ),
+      );
+    } else {
+      return new Container();
+    }
+  }
+
   Widget _showPasswordInput() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 10.0),
@@ -288,6 +374,100 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
         onSaved: (value) => _password = value,
       ),
     );
+  }
+
+  Widget _showDropDownButtonFilial() {
+    return _formMode == FormMode.LOGIN || _constructions == null
+        ? new Container()
+        : Padding(
+            padding: EdgeInsets.fromLTRB(40.0, 0.0, 0.0, 0.0),
+            child: SizedBox(
+                width: shw,
+                height: 60.0,
+                child: new DropdownButton<String>(
+                  underline: Container(
+                    height: 1,
+                    color: Colors.grey,
+                  ),
+                  hint: new Text("Выберите филиал",
+                      overflow: TextOverflow.fade,
+                      style: TextStyle(
+                        color: Colors.grey,
+                        //  fontSize: 20,
+                        // fontWeight: FontWeight.w300
+                      )),
+                  value: selectedConstructions,
+                  onChanged: (String newValue) {
+                    setState(() {
+                      selectedConstructions = newValue;
+                    });
+                    print(selectedConstructions);
+                  },
+                  isDense: false,
+                  isExpanded: true,
+                  items: _constructions.map((Constructions map) {
+                    return new DropdownMenuItem<String>(
+                      value: map.id.toString(),
+                      child: new Text(map.name,
+                          style: TextStyle(
+                              color: Colors.black,
+                              //   fontSize: 20,
+                              fontWeight: FontWeight.normal)),
+                    );
+                  }).toList(),
+                )));
+  }
+
+  Widget _showEmployerNameInput() {
+    if (_formMode == FormMode.SIGNUP) {
+      return Padding(
+        padding: _formMode == FormMode.LOGIN
+            ? const EdgeInsets.fromLTRB(0.0, 45.0, 0.0, 0.0)
+            : const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+        child: new TextFormField(
+          maxLines: 1,
+          keyboardType: TextInputType.text,
+          autofocus: false,
+          decoration: new InputDecoration(
+              hintText: 'Работодатель',
+              icon: new Icon(
+                Icons.person,
+                color: Colors.grey,
+              )),
+          validator: (value) =>
+              value.isEmpty ? 'Поле не может быть пустым' : null,
+          onSaved: (value) => _employerName = value,
+        ),
+      );
+    } else {
+      return new Container();
+    }
+  }
+
+  Widget _showOccupationInput() {
+    if (_formMode == FormMode.SIGNUP) {
+      return Padding(
+        padding: _formMode == FormMode.LOGIN
+            ? const EdgeInsets.fromLTRB(0.0, 45.0, 0.0, 0.0)
+            : const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+        child: new TextFormField(
+          maxLines: 1,
+          keyboardType: TextInputType.text,
+          autofocus: false,
+          decoration: new InputDecoration(
+              hintText: 'Специальность',
+              icon: new Icon(
+                Icons.person_add,
+                color: Colors.grey,
+              )),
+          validator: (value) =>
+              value.isEmpty ? 'Поле не может быть пустым' : null,
+          onSaved: (value) => _occupation = value,
+        ),
+      );
+    } else {
+      return new Container();
+    }
   }
 
   Widget _showSecondaryButton() {
@@ -349,5 +529,15 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
               _launchURL();
             },
           );
+  }
+}
+
+class Constructions {
+  final int id;
+  final String name;
+  Constructions({this.id, this.name});
+  factory Constructions.fromJson(Map<String, dynamic> json) {
+    return new Constructions(
+        id: json['id'] as int, name: json['name'] as String);
   }
 }
