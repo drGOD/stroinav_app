@@ -24,6 +24,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
   String _email;
   String _phone;
   String _password;
+  String _employerINN;
   String _employerName;
   String _occupation;
   String _errorMessage;
@@ -37,6 +38,8 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
   bool _isLoading;
 
   double shw;
+
+  final TextEditingController _controller = new TextEditingController();
 
   Future<List<Constructions>> getFilials() async {
     final http.Response response = await http.get(
@@ -99,7 +102,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
     return jsonDecode(response.body)['id'];
   }
 
-  Future checkINN() async {
+  Future checkINN(String _employerINN) async {
     final response = await http.post(
         'https://suggestions.dadata.ru/suggestions/api/4_1/rs/findById/party',
         headers: {
@@ -108,8 +111,15 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
           'Content-Type': 'application/json',
           'Cookie': '__ddg1=i268GlwdoGcT5C4BlmyV'
         },
-        body: jsonEncode({"query": "7707083893"}));
-    print(jsonDecode(response.body)['suggestions'][0]['value']);
+        body: jsonEncode({"query": "$_employerINN"}));
+    print(jsonDecode(response.body)['suggestions'].length);
+
+    if (jsonDecode(response.body)['suggestions'].length > 0) {
+      _employerName = jsonDecode(response.body)['suggestions'][0]['value'];
+      return true;
+    } else {
+      return false;
+    }
   }
 
   _launchURL() async {
@@ -128,6 +138,54 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
       return true;
     }
     return false;
+  }
+
+  _askedToINN() async {
+    setState(() {
+      _errorMessage = "";
+      _isLoading = true;
+    });
+    if (_validateAndSave()) {
+      if (await checkINN(_employerINN)) {
+        return showDialog(
+            context: context,
+            builder: (context) {
+              return SimpleDialog(
+                title: Text('Ваш работодатель $_employerName ?'),
+                children: <Widget>[
+                  SimpleDialogOption(
+                    onPressed: () {
+                      _validateAndSubmit();
+                      Navigator.of(context, rootNavigator: true).pop();
+                    },
+                    child: const Text('ДА'),
+                  ),
+                  SimpleDialogOption(
+                    onPressed: () {
+                      setState(() {
+                        _isLoading = false;
+                      });
+                      Navigator.of(context, rootNavigator: true).pop();
+                      _controller.clear();
+                      _validateAndSave();
+                    },
+                    child: const Text('Нет'),
+                  ),
+                ],
+              );
+            });
+      } else {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = "Не верный ИНН работодателя";
+          _employerINN = '';
+          _controller.clear();
+          _validateAndSave();
+        });
+      }
+    } else {
+      _isLoading = false;
+    }
   }
 
   _validateAndSubmit() async {
@@ -197,13 +255,6 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
     });
   }
 
-  void _changeloginMode() {
-    _errorMessage = "";
-    setState(() {
-      _formMode = FormMode.SIGNUP;
-    });
-  }
-
   void _changeFormToLogin() {
     _formKey.currentState.reset();
     _errorMessage = "";
@@ -258,7 +309,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                 _showPhoneInput(),
                 _showPasswordInput(),
                 _showDropDownButtonFilial(),
-                _showEmployerNameInput(),
+                _showEmployerINNInput(),
                 _showOccupationInput(),
                 _showRulesButton(),
                 _showPrimaryButton(),
@@ -450,25 +501,27 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                 )));
   }
 
-  Widget _showEmployerNameInput() {
+  Widget _showEmployerINNInput() {
     if (_formMode == FormMode.SIGNUP) {
       return Padding(
         padding: _formMode == FormMode.LOGIN
             ? const EdgeInsets.fromLTRB(0.0, 45.0, 0.0, 0.0)
             : const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
         child: new TextFormField(
+          controller: _controller,
           maxLines: 1,
-          keyboardType: TextInputType.text,
+          keyboardType: TextInputType.number,
           autofocus: false,
           decoration: new InputDecoration(
-              hintText: 'Работодатель',
+              hintText: 'ИНН работодателя',
               icon: new Icon(
                 Icons.person,
                 color: Colors.grey,
               )),
-          validator: (value) =>
-              value.isEmpty ? 'Поле не может быть пустым' : null,
-          onSaved: (value) => _employerName = value,
+          validator: (value) => value.length != 10 && value.length != 12
+              ? 'Некорректный ИНН'
+              : null,
+          onSaved: (value) => _employerINN = value,
         ),
       );
     } else {
@@ -536,7 +589,9 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                   : new Text('Создать аккаунт',
                       style:
                           new TextStyle(fontSize: 20.0, color: Colors.white)),
-              onPressed: _validateAndSubmit),
+              onPressed: _formMode == FormMode.SIGNUP
+                  ? _askedToINN
+                  : _validateAndSubmit),
         ));
   }
 
